@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StaffSpy — Інструкція</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg:      #07090c;
+  --s1:      #0d1117;
+  --s2:      #111820;
+  --border:  #1a2332;
+  --accent:  #f59e0b;
+  --green:   #10b981;
+  --red:     #ef4444;
+  --blue:    #3b82f6;
+  --text:    #e2e8f0;
+  --muted:   #4b6080;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.7;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 100% 0%, rgba(245,158,11,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 0% 100%, rgba(59,130,246,.04) 0%, transparent 60%);
+}
+
+/* HERO */
+.hero {
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(245,158,11,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.logo {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -.04em;
+  color: #fff;
+  margin-bottom: .5rem;
+}
+.logo span { color: var(--accent); }
+
+.tagline {
+  font-size: .75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  margin-bottom: 2rem;
+}
+
+.hero-badges {
+  display: flex;
+  justify-content: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+.badge {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: .35rem 1rem;
+  font-size: .65rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.badge b { color: var(--accent); }
+
+/* CONTAINER */
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+/* SECTION */
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-label {
+  font-family: 'Unbounded', sans-serif;
+  font-size: .6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* STEPS */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.step {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 1.2rem;
+  align-items: start;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.step:hover { border-color: rgba(245,158,11,.3); }
+.step::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.step:hover::before { opacity: 1; }
+
+.step-num {
+  width: 48px; height: 48px;
+  background: rgba(245,158,11,.1);
+  border: 1px solid rgba(245,158,11,.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.step-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: .5rem;
+  letter-spacing: -.01em;
+}
+
+.step-desc {
+  font-size: .72rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.step-desc b { color: var(--text); }
+
+/* WARNING BOX */
+.warn-box {
+  background: rgba(245,158,11,.06);
+  border: 1px solid rgba(245,158,11,.2);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-size: .7rem;
+  color: #d97706;
+  display: flex;
+  gap: .8rem;
+  align-items: flex-start;
+  margin-top: .8rem;
+}
+.warn-icon { font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+
+/* INFO BOX */
+.info-box {
+  background: rgba(59,130,246,.06);
+  border: 1px solid rgba(59,130,246,.2);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  font-size: .7rem;
+  color: #60a5fa;
+  display: flex;
+  gap: .8rem;
+  align-items: flex-start;
+  margin-top: .8rem;
+}
+
+/* CODE BLOCK */
+.code-block {
+  background: #060a0f;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .8rem 1rem;
+  font-size: .68rem;
+  color: #7dd3fc;
+  margin-top: .6rem;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.6;
+}
+.code-comment { color: #334155; }
+.code-cmd     { color: var(--accent); }
+
+/* REPORT PREVIEW */
+.report-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
+.feat-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+.feat-icon { font-size: 1.4rem; margin-bottom: .5rem; }
+.feat-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: .65rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: .3rem;
+}
+.feat-desc { font-size: .62rem; color: var(--muted); }
+
+/* FAQ */
+.faq { display: flex; flex-direction: column; gap: .75rem; }
+
+.faq-item {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.faq-q {
+  padding: 1rem 1.2rem;
+  font-size: .72rem;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: background .15s;
+}
+.faq-q:hover { background: var(--s2); }
+.faq-q b { color: var(--accent); margin-right: .5rem; }
+.faq-arrow { color: var(--muted); transition: transform .2s; font-size: .8rem; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-a {
+  padding: 0 1.2rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease, padding .3s;
+  font-size: .68rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.faq-item.open .faq-a { max-height: 200px; padding: .8rem 1.2rem 1rem; }
+
+/* ERROR TABLE */
+.err-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .68rem;
+  margin-top: 1rem;
+}
+.err-table th {
+  background: #060a0f;
+  color: var(--muted);
+  text-align: left;
+  padding: .7rem 1rem;
+  font-size: .58rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  border-bottom: 1px solid var(--border);
+}
+.err-table td {
+  padding: .7rem 1rem;
+  border-bottom: 1px solid rgba(26,35,50,.6);
+  vertical-align: top;
+}
+.err-table tr:last-child td { border-bottom: none; }
+.err-table tr:hover td { background: var(--s2); }
+.err-err { color: var(--red); }
+.err-fix { color: var(--green); }
+
+/* SUPPORT */
+.support-box {
+  background: linear-gradient(135deg, rgba(245,158,11,.08) 0%, rgba(59,130,246,.05) 100%);
+  border: 1px solid rgba(245,158,11,.2);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+}
+.support-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: .5rem;
+}
+.support-sub { font-size: .7rem; color: var(--muted); margin-bottom: 1.2rem; }
+.support-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Unbounded', sans-serif;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: .7rem 1.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  letter-spacing: .02em;
+  transition: opacity .2s;
+}
+.support-btn:hover { opacity: .85; }
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+  font-size: .6rem;
+  border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="logo">Staff<span>Spy</span></div>
+  <div class="tagline">Інструкція з використання</div>
+  <div class="hero-badges">
+    <div class="badge">🖥 <b>Windows</b> 10 / 11</div>
+    <div class="badge">⚡ <b>PowerShell</b> 5.1+</div>
+    <div class="badge">🔐 Права <b>Адміністратора</b></div>
+    <div class="badge">🌐 Інтернет при запуску</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- КРОК 1 -->
+  <div class="section">
+    <div class="section-label">Перший запуск</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Запустіть installer.ps1 від Адміністратора</div>
+          <div class="step-desc">
+            Це потрібно зробити <b>один раз</b> на кожному комп'ютері який хочете відстежувати.<br><br>
+            <b>Правий клік</b> на файл <b>installer.ps1</b> → вибрати <b>"Запустити як адміністратор"</b>
+          </div>
+          <div class="warn-box">
+            <span class="warn-icon">⚠️</span>
+            Якщо Windows запитає "Дозволити програмі вносити зміни?" — натисніть <b>Так</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Дочекайтесь завершення встановлення</div>
+          <div class="step-desc">
+            Скрипт автоматично налаштує систему і покаже повідомлення:<br><br>
+            <b>✅ ВСТАНОВЛЕННЯ ЗАВЕРШЕНО УСПІШНО</b><br><br>
+            Натисніть Enter для закриття. Встановлення займає ~1 хвилину.
+          </div>
+          <div class="info-box">
+            <span class="warn-icon">ℹ️</span>
+            З цього моменту система починає записувати всі запуски програм. Моніторинг працює автоматично у фоні.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Якщо з'явилась помилка "виконання скриптів відключено"</div>
+          <div class="step-desc">
+            Відкрийте <b>PowerShell від Адміністратора</b> і виконайте одну команду:
+          </div>
+          <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope LocalMachine</div>
+          <div class="step-desc" style="margin-top:.6rem">
+            Після цього запустіть installer.ps1 знову.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- КРОК 2 -->
+  <div class="section">
+    <div class="section-label">Отримання звіту</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Через тиждень — запустіть launcher.ps1</div>
+          <div class="step-desc">
+            Можна запускати в будь-який момент — хоч через день, хоч через місяць.<br><br>
+            <b>Правий клік</b> на файл <b>launcher.ps1</b> → <b>"Запустити як адміністратор"</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Зачекайте 1-2 хвилини</div>
+          <div class="step-desc">
+            Скрипт перевірить ліцензію, завантажить модуль аналізу і обробить всі дані.<br><br>
+            Після завершення <b>автоматично відкриється HTML звіт</b> у браузері.
+          </div>
+          <div class="info-box">
+            <span class="warn-icon">💾</span>
+            Звіт зберігається у папці <b>C:\StaffSpy\</b> — можна відкривати пізніше або переносити на флешку.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ЩО У ЗВІТІ -->
+  <div class="section">
+    <div class="section-label">Що містить звіт</div>
+    <div class="report-features">
+      <div class="feat-card">
+        <div class="feat-icon">📅</div>
+        <div class="feat-title">Дата і день тижня</div>
+        <div class="feat-desc">Коли саме запускалась програма — число, місяць, день тижня</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⏰</div>
+        <div class="feat-title">Час запуску і закриття</div>
+        <div class="feat-desc">Точний час до секунди — коли відкрили і коли закрили</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⏱</div>
+        <div class="feat-title">Тривалість роботи</div>
+        <div class="feat-desc">Скільки часу програма була відкрита — години і хвилини</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">👤</div>
+        <div class="feat-title">Обліковий запис</div>
+        <div class="feat-desc">Який користувач Windows запустив програму</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔍</div>
+        <div class="feat-title">Фільтри і сортування</div>
+        <div class="feat-desc">По даті, програмі, користувачу, дню тижня, статусу</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🚫</div>
+        <div class="feat-title">Без системних процесів</div>
+        <div class="feat-desc">Тільки програми користувача. Системні приховані за замовчуванням</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-label">Часті питання</div>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span><b>?</b> Звіт порожній — чому?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Аудит почав записувати дані тільки після встановлення installer.ps1. Якщо запустили launcher одразу — даних ще немає. Зачекайте хоча б кілька годин роботи комп'ютера і запустіть знову.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span><b>?</b> Скільки разів можна запускати launcher?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Кількість запусків залежить від вашого тарифу. Залишок запусків показується в кінці кожного звіту. Поповнити можна в боті — /start → Придбати.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span><b>?</b> Чи бачать користувачі що за ними слідкують?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Ні. Моніторинг використовує вбудований механізм Windows (аудит процесів) який працює непомітно у фоні. Жодних додаткових процесів чи іконок в треї.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span><b>?</b> Потрібен інтернет весь час?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Інтернет потрібен тільки при запуску launcher.ps1 — для перевірки ліцензії і завантаження модуля аналізу. Сам моніторинг працює повністю офлайн.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span><b>?</b> Чи потрібно встановлювати на кожен ПК окремо?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Так, installer.ps1 запускається один раз на кожному комп'ютері. Але launcher.ps1 можна запускати з флешки на будь-якому ПК де встановлений installer.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПОМИЛКИ -->
+  <div class="section">
+    <div class="section-label">Вирішення помилок</div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="err-table">
+        <thead>
+          <tr>
+            <th>Помилка</th>
+            <th>Рішення</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="err-err">Виконання скриптів відключено</td>
+            <td class="err-fix">PowerShell від адміна → Set-ExecutionPolicy RemoteSigned</td>
+          </tr>
+          <tr>
+            <td class="err-err">Аудит не налаштовано</td>
+            <td class="err-fix">Запустіть installer.ps1 від Адміністратора</td>
+          </tr>
+          <tr>
+            <td class="err-err">Невірний ключ або пароль</td>
+            <td class="err-fix">Перевірте ключ і пароль з повідомлення бота — скопіюйте точно</td>
+          </tr>
+          <tr>
+            <td class="err-err">Ліцензію вичерпано</td>
+            <td class="err-fix">Придбайте нову ліцензію в боті — /start → Придбати</td>
+          </tr>
+          <tr>
+            <td class="err-err">Не вдалося підключитись до сервера</td>
+            <td class="err-fix">Перевірте інтернет-з'єднання і запустіть знову</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ПІДТРИМКА -->
+  <div class="section">
+    <div class="support-box">
+      <div class="support-title">Потрібна допомога?</div>
+      <div class="support-sub">Відповідаємо протягом 30 хвилин в робочий час</div>
+      <a href="https://t.me/StaffSpy_01_Bot" class="support-btn">✉️ Написати в підтримку</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  StaffSpy v1.0 &bull; Інструкція для клієнта
+</footer>
+
+<script>
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  item.classList.toggle('open');
+}
+</script>
+
+</body>
+</html>
