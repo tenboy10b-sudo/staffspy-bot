@@ -5,21 +5,20 @@ $ReportPath  = "$env:USERPROFILE\Desktop\StaffSpy_DEMO.html"
 
 Clear-Host
 Write-Host "  StaffSpy DEMO v2.0" -ForegroundColor Yellow
-Write-Host "  Демо версія — 4 модулі з 22" -ForegroundColor Gray
+Write-Host "  Demo - 4 moduli z 22" -ForegroundColor Gray
 Write-Host ""
-Write-Host "  [*] Збираю дані системи..." -ForegroundColor Cyan
+Write-Host "  [*] System info..." -ForegroundColor Cyan
 
 $os     = Get-WmiObject Win32_OperatingSystem
 $cs     = Get-WmiObject Win32_ComputerSystem
 $uptime = (Get-Date) - $os.ConvertToDateTime($os.LastBootUpTime)
 $uptimeH = [int]$uptime.TotalHours
 $uptimeM = $uptime.Minutes
-$uptimeStr = "$uptimeH год $uptimeM хв"
 $ramGB  = [math]::Round($cs.TotalPhysicalMemory / 1GB, 1)
 $osName = $os.Caption
-Write-Host "  [+] Система: OK" -ForegroundColor Green
+Write-Host "  [OK] System: done" -ForegroundColor Green
 
-Write-Host "  [*] Збираю встановлені програми..." -ForegroundColor Cyan
+Write-Host "  [*] Software list..." -ForegroundColor Cyan
 $software = @()
 $regPaths = @(
     "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
@@ -34,9 +33,9 @@ foreach ($path in $regPaths) {
     }
 }
 $software = $software | Where-Object { $_.Name } | Sort-Object Name -Unique
-Write-Host "  [+] Програм знайдено: $($software.Count)" -ForegroundColor Green
+Write-Host "  [OK] Software: $($software.Count)" -ForegroundColor Green
 
-Write-Host "  [*] Збираю активні процеси..." -ForegroundColor Cyan
+Write-Host "  [*] Processes..." -ForegroundColor Cyan
 $SYSTEM_PROC = @("svchost","lsass","csrss","wininit","winlogon","services","spoolsv",
     "dwm","conhost","dllhost","rundll32","msiexec","wmiprvse","searchindexer",
     "runtimebroker","shellexperiencehost","startmenuexperiencehost","sihost",
@@ -54,22 +53,19 @@ $processes = Get-WmiObject Win32_Process | ForEach-Object {
     }
     $startStr = if ($startTime) { $startTime.ToString("dd.MM.yyyy HH:mm:ss") } else { "" }
     [PSCustomObject]@{
-        Name      = [string]$procName
-        User      = [string]$user
-        StartTime = $startTime
-        StartStr  = $startStr
-        MemMB     = [math]::Round($_.WorkingSetSize / 1MB, 1)
+        Name     = [string]$procName
+        User     = [string]$user
+        StartStr = $startStr
     }
-} | Where-Object { $_ -ne $null -and $_.Name } | Sort-Object StartTime -Descending
+} | Where-Object { $_ -ne $null -and $_.Name } | Sort-Object StartStr -Descending
+Write-Host "  [OK] Processes: $($processes.Count)" -ForegroundColor Green
 
-Write-Host "  [+] Процесів: $($processes.Count)" -ForegroundColor Green
-
-Write-Host "  [*] Збираю USB..." -ForegroundColor Cyan
+Write-Host "  [*] USB..." -ForegroundColor Cyan
 $usbCount = 0
 try {
     $usbCount = (Get-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Enum\USBSTOR\*\*" 2>$null | Where-Object { $_.FriendlyName }).Count
 } catch {}
-Write-Host "  [+] USB: $usbCount" -ForegroundColor Green
+Write-Host "  [OK] USB: $usbCount" -ForegroundColor Green
 
 try {
     $whUser = $env:USERNAME
@@ -78,22 +74,22 @@ try {
     Invoke-WebRequest -Uri "$RAILWAY_URL/launch" -Method POST -Body $whBody -ContentType "application/json" -UseBasicParsing -TimeoutSec 8 | Out-Null
 } catch {}
 
-Write-Host "  [*] Генерую звіт..." -ForegroundColor Cyan
+Write-Host "  [*] Generating report..." -ForegroundColor Cyan
 $now = Get-Date -Format "dd.MM.yyyy HH:mm"
 
 function CleanStr { param([string]$s) return ($s -replace "[<>]","") }
 
-$lockCell = "<td style='background:#f8fafc;text-align:center'><span style='display:inline-flex;align-items:center;gap:.35rem;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:.2rem .6rem;font-size:.62rem;color:#92400e;font-weight:600'>&#128274; Повна версія</span></td>"
+$lockCell = "<td class=" + [char]39 + "lock-cell" + [char]39 + "><span class=" + [char]39 + "lock-badge" + [char]39 + ">&#128274; &#1055;&#1086;&#1074;&#1085;&#1072; &#1074;&#1077;&#1088;&#1089;&#1110;&#1103;</span></td>"
 
 $procRows = ($processes | Select-Object -First 10 | ForEach-Object {
     $n = CleanStr $_.Name
     $u = CleanStr $_.User
-    $startStr = $_.StartStr
-    "<tr><td style='font-weight:600;color:#0f172a'>" + $n + "</td><td style='color:#334155'>" + $startStr + "</td>" + $lockCell + $lockCell + "<td style='color:#3b82f6'>" + $u + "</td></tr>"
+    "<tr><td style=" + [char]39 + "font-weight:600;color:#0f172a" + [char]39 + ">" + $n + "</td><td style=" + [char]39 + "color:#334155" + [char]39 + ">" + $_.StartStr + "</td>" + $lockCell + $lockCell + "<td style=" + [char]39 + "color:#3b82f6" + [char]39 + ">" + $u + "</td></tr>"
 }) -join "`n"
 
 $pc  = $env:COMPUTERNAME
 $usr = $env:USERNAME
+$uptimeStr = "$uptimeH" + "h " + "$uptimeM" + "m"
 
 $htmlTemplate = @"
 <!DOCTYPE html>
@@ -132,75 +128,70 @@ tbody tr:hover td{background:#fffbeb;}
 .tag{font-size:.52rem;padding:.15rem .45rem;border-radius:4px;font-weight:700;flex-shrink:0;}
 .mod.ok .tag{background:#dcfce7;color:#16a34a;}
 .mod.locked .tag{background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0;}
+.lock-cell{background:#fafafa;text-align:center;}
+.lock-badge{display:inline-flex;align-items:center;gap:.3rem;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:.2rem .6rem;font-size:.62rem;color:#92400e;font-weight:600;}
 .upsell{background:linear-gradient(135deg,#fffbeb 0%,#eff6ff 100%);border:2px solid #fde68a;border-radius:16px;padding:2rem;text-align:center;margin:0 2rem 2rem;}
 .upsell h3{font-family:'Unbounded',sans-serif;font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:.5rem;}
 .upsell p{font-size:.72rem;color:#64748b;margin-bottom:1.2rem;line-height:1.8;}
 .upsell a{display:inline-block;background:#f59e0b;color:#fff;font-family:'Unbounded',sans-serif;font-size:.72rem;font-weight:700;padding:.75rem 2rem;border-radius:9px;text-decoration:none;box-shadow:0 4px 12px rgba(245,158,11,.3);}
-.muted{color:#94a3b8;font-size:.65rem;}
-.center{text-align:center;color:#94a3b8;padding:1.5rem;}
 .note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:.8rem 1rem;font-size:.68rem;color:#1d4ed8;margin-bottom:1rem;}
 footer{text-align:center;padding:1.5rem;color:#94a3b8;font-size:.62rem;border-top:1px solid #e2e8f0;background:#fff;margin-top:1rem;}
 </style>
 </head>
 <body>
 HEADER_PLACEHOLDER
-<div class=`"cards`">
-CARDS_PLACEHOLDER
-</div>
+<div class=`"cards`">CARDS_PLACEHOLDER</div>
 
-<div class=`"section`"><h2>Модулі демо версії</h2></div>
+<div class=`"section`"><h2>&#1052;&#1086;&#1076;&#1091;&#1083;&#1110; &#1076;&#1077;&#1084;&#1086; &#1074;&#1077;&#1088;&#1089;&#1110;&#1111;</h2></div>
 <div class=`"modules`">
-  <div class=`"mod ok`"><span class=`"tag`">OK</span> Інформація про систему</div>
-  <div class=`"mod ok`"><span class=`"tag`">OK</span> Встановлене ПЗ</div>
-  <div class=`"mod ok`"><span class=`"tag`">OK</span> Активні процеси</div>
-  <div class=`"mod ok`"><span class=`"tag`">OK</span> USB-пристрої</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Журнал запусків програм</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Час запуску і закриття</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Тривалість роботи</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Активність по днях</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Фільтри і сортування</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Звіт по користувачах</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> Експорт в Excel</div>
-  <div class=`"mod locked`"><span class=`"tag`">lock</span> + ще 11 модулів...</div>
+  <div class=`"mod ok`"><span class=`"tag`">OK</span> &#1030;&#1085;&#1092;&#1086;&#1088;&#1084;&#1072;&#1094;&#1110;&#1103; &#1087;&#1088;&#1086; &#1089;&#1080;&#1089;&#1090;&#1077;&#1084;&#1091;</div>
+  <div class=`"mod ok`"><span class=`"tag`">OK</span> &#1042;&#1089;&#1090;&#1072;&#1085;&#1086;&#1074;&#1083;&#1077;&#1085;&#1077; &#1055;&#1047;</div>
+  <div class=`"mod ok`"><span class=`"tag`">OK</span> &#1040;&#1082;&#1090;&#1080;&#1074;&#1085;&#1110; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1080;</div>
+  <div class=`"mod ok`"><span class=`"tag`">OK</span> USB-&#1087;&#1088;&#1080;&#1089;&#1090;&#1088;&#1086;&#1111;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1046;&#1091;&#1088;&#1085;&#1072;&#1083; &#1079;&#1072;&#1087;&#1091;&#1089;&#1082;&#1110;&#1074; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1063;&#1072;&#1089; &#1079;&#1072;&#1087;&#1091;&#1089;&#1082;&#1091; &#1110; &#1079;&#1072;&#1082;&#1088;&#1080;&#1090;&#1090;&#1103;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1058;&#1088;&#1080;&#1074;&#1072;&#1083;&#1110;&#1089;&#1090;&#1100; &#1088;&#1086;&#1073;&#1086;&#1090;&#1080;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1040;&#1082;&#1090;&#1080;&#1074;&#1085;&#1110;&#1089;&#1090;&#1100; &#1087;&#1086; &#1076;&#1085;&#1103;&#1093;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1060;&#1110;&#1083;&#1100;&#1090;&#1088;&#1080; &#1110; &#1089;&#1086;&#1088;&#1090;&#1091;&#1074;&#1072;&#1085;&#1085;&#1103;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1047;&#1074;&#1110;&#1090; &#1087;&#1086; &#1082;&#1086;&#1088;&#1080;&#1089;&#1090;&#1091;&#1074;&#1072;&#1095;&#1072;&#1093;</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> &#1045;&#1082;&#1089;&#1087;&#1086;&#1088;&#1090; &#1074; Excel</div>
+  <div class=`"mod locked`"><span class=`"tag`">lock</span> + &#1097;&#1077; 11 &#1084;&#1086;&#1076;&#1091;&#1083;&#1110;&#1074;...</div>
 </div>
 
 <div class=`"section`">
-  <h2>Запущені програми (демо — поточні процеси)</h2>
-  <div class=`"note`">
-    У повній версії ця таблиця містить точний час запуску і закриття кожної програми, тривалість роботи та фільтри за весь період моніторингу.
-  </div>
+  <h2>&#1047;&#1072;&#1087;&#1091;&#1097;&#1077;&#1085;&#1110; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1080; (&#1076;&#1077;&#1084;&#1086; &mdash; 10 &#1079; &#1091;&#1089;&#1110;&#1093;)</h2>
+  <div class=`"note`">&#1059; &#1087;&#1086;&#1074;&#1085;&#1110;&#1081; &#1074;&#1077;&#1088;&#1089;&#1110;&#1111; &#1094;&#1103; &#1090;&#1072;&#1073;&#1083;&#1080;&#1094;&#1103; &#1084;&#1110;&#1089;&#1090;&#1080;&#1090;&#1100; &#1090;&#1086;&#1095;&#1085;&#1080;&#1081; &#1095;&#1072;&#1089; &#1079;&#1072;&#1087;&#1091;&#1089;&#1082;&#1091; &#1110; &#1079;&#1072;&#1082;&#1088;&#1080;&#1090;&#1090;&#1103; &#1082;&#1086;&#1078;&#1085;&#1086;&#1111; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1080;, &#1090;&#1088;&#1080;&#1074;&#1072;&#1083;&#1110;&#1089;&#1090;&#1100; &#1088;&#1086;&#1073;&#1086;&#1090;&#1080; &#1090;&#1072; &#1092;&#1110;&#1083;&#1100;&#1090;&#1088;&#1080; &#1079;&#1072; &#1074;&#1077;&#1089;&#1100; &#1087;&#1077;&#1088;&#1110;&#1086;&#1076; &#1084;&#1086;&#1085;&#1110;&#1090;&#1086;&#1088;&#1080;&#1085;&#1075;&#1091;.</div>
   <div class=`"tw`"><table>
-    <thead>
-      <tr>
-        <th>Програма</th>
-        <th>Дата та час запуску</th>
-        <th>Дата та час закриття</th>
-        <th>Тривалість роботи</th>
-        <th>Користувач</th>
-      </tr>
-    </thead>
+    <thead><tr>
+      <th>&#1055;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1072;</th>
+      <th>&#1044;&#1072;&#1090;&#1072; &#1090;&#1072; &#1095;&#1072;&#1089; &#1079;&#1072;&#1087;&#1091;&#1089;&#1082;&#1091;</th>
+      <th>&#1044;&#1072;&#1090;&#1072; &#1090;&#1072; &#1095;&#1072;&#1089; &#1079;&#1072;&#1082;&#1088;&#1080;&#1090;&#1090;&#1103;</th>
+      <th>&#1058;&#1088;&#1080;&#1074;&#1072;&#1083;&#1110;&#1089;&#1090;&#1100; &#1088;&#1086;&#1073;&#1086;&#1090;&#1080;</th>
+      <th>&#1050;&#1086;&#1088;&#1080;&#1089;&#1090;&#1091;&#1074;&#1072;&#1095;</th>
+    </tr></thead>
     <tbody>PROC_ROWS</tbody>
   </table></div>
 </div>
 
 <div class=`"upsell`">
-  <h3>Хочете бачити повну картину?</h3>
-  <p>Повна версія показує точний час запуску та закриття кожної програми,<br>тривалість роботи, звіт по кожному користувачу з фільтрами та експортом в Excel.</p>
-  <a href=`"https://t.me/StaffSpy_01_Bot`">Отримати повну версію</a>
+  <h3>&#1061;&#1086;&#1095;&#1077;&#1090;&#1077; &#1073;&#1072;&#1095;&#1080;&#1090;&#1080; &#1087;&#1086;&#1074;&#1085;&#1091; &#1082;&#1072;&#1088;&#1090;&#1080;&#1085;&#1091;?</h3>
+  <p>&#1055;&#1086;&#1074;&#1085;&#1072; &#1074;&#1077;&#1088;&#1089;&#1110;&#1103; &#1087;&#1086;&#1082;&#1072;&#1079;&#1091;&#1108;: &#1103;&#1082;&#1110; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1080; &#1079;&#1072;&#1087;&#1091;&#1089;&#1082;&#1072;&#1083;&#1080;&#1089;&#1100; &#1110; &#1082;&#1086;&#1083;&#1080;, &#1093;&#1090;&#1086; &#1110; &#1089;&#1082;&#1110;&#1083;&#1100;&#1082;&#1080; &#1087;&#1088;&#1072;&#1094;&#1102;&#1074;&#1072;&#1074;,<br>&#1076;&#1077;&#1090;&#1072;&#1083;&#1100;&#1085;&#1080;&#1081; &#1079;&#1074;&#1110;&#1090; &#1079;&#1072; &#1073;&#1091;&#1076;&#1100;-&#1103;&#1082;&#1080;&#1081; &#1087;&#1077;&#1088;&#1110;&#1086;&#1076; &#1079; &#1092;&#1110;&#1083;&#1100;&#1090;&#1088;&#1072;&#1084;&#1080; &#1090;&#1072; &#1077;&#1082;&#1089;&#1087;&#1086;&#1088;&#1090;&#1086;&#1084; &#1074; Excel.</p>
+  <a href=`"https://t.me/StaffSpy_01_Bot`">&#1054;&#1090;&#1088;&#1080;&#1084;&#1072;&#1090;&#1080; &#1087;&#1086;&#1074;&#1085;&#1091; &#1074;&#1077;&#1088;&#1089;&#1110;&#1102;</a>
 </div>
 
 <footer>StaffSpy DEMO v2.0 | NOW_PLACEHOLDER | PC_PLACEHOLDER</footer>
 </body></html>
 "@
 
-$headerHtml = "<div class=header><div><div class=logo>Staff<span>Spy</span><span class=badge>DEMO</span></div><div style='font-size:.6rem;color:#94a3b8;margin-top:.3rem'>Демонстраційна версія — 4 з 22 модулів</div></div><div class=meta>" + $now + " | " + $pc + "<br>" + $usr + " | " + $osName + "</div></div>"
+$osCard   = "<div class=card><div class=card-l>OS</div><div class=card-v style=" + [char]39 + "font-size:.82rem" + [char]39 + ">" + $osName + "</div></div>"
+$ramCard  = "<div class=card><div class=card-l>RAM</div><div class=card-v>" + $ramGB + " GB</div></div>"
+$upCard   = "<div class=card><div class=card-l>Uptime</div><div class=card-v style=" + [char]39 + "font-size:.95rem" + [char]39 + ">" + $uptimeStr + "</div></div>"
+$prcCard  = "<div class=card><div class=card-l>Processes</div><div class=card-v>" + $processes.Count + "</div></div>"
+$swCard   = "<div class=card><div class=card-l>Software</div><div class=card-v>" + $software.Count + "</div></div>"
+$usbCard  = "<div class=card><div class=card-l>USB</div><div class=card-v>" + $usbCount + "</div></div>"
 
-$cardsHtml = "<div class=card><div class=card-l>ОС</div><div class=card-v style='font-size:.82rem;margin-top:.1rem'>" + $osName + "</div></div>" +
-             "<div class=card><div class=card-l>RAM</div><div class=card-v>" + $ramGB + " ГБ</div></div>" +
-             "<div class=card><div class=card-l>Аптайм</div><div class=card-v style='font-size:.95rem'>" + $uptimeStr + "</div></div>" +
-             "<div class=card><div class=card-l>Процесів</div><div class=card-v>" + $processes.Count + "</div></div>" +
-             "<div class=card><div class=card-l>Програм</div><div class=card-v>" + $software.Count + "</div></div>" +
-             "<div class=card><div class=card-l>USB</div><div class=card-v>" + $usbCount + "</div></div>"
+$headerHtml = "<div class=header><div><div class=logo>Staff<span>Spy</span><span class=badge>DEMO</span></div></div><div class=meta>" + $now + " | " + $pc + "<br>" + $usr + " | " + $osName + "</div></div>"
+$cardsHtml  = $osCard + $ramCard + $upCard + $prcCard + $swCard + $usbCard
 
 $htmlFinal = $htmlTemplate
 $htmlFinal = $htmlFinal -replace "HEADER_PLACEHOLDER", $headerHtml
@@ -212,9 +203,9 @@ $htmlFinal = $htmlFinal -replace "PC_PLACEHOLDER",     $pc
 [System.IO.File]::WriteAllText($ReportPath, $htmlFinal, [System.Text.Encoding]::UTF8)
 Start-Process $ReportPath
 
-Write-Host "  [OK] Демо звіт збережено на Робочому столі" -ForegroundColor Green
+Write-Host "  [OK] Report saved to Desktop" -ForegroundColor Green
 Write-Host "  StaffSpy_DEMO.html" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Повна версія: t.me/StaffSpy_01_Bot" -ForegroundColor Yellow
+Write-Host "  Full version: t.me/StaffSpy_01_Bot" -ForegroundColor Yellow
 Write-Host ""
-Read-Host "  Натисніть Enter для виходу"
+Read-Host "  Press Enter to exit"
