@@ -443,60 +443,34 @@ async def cb_issue_license(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     # Send license info
     license_text = (
-        f"🎉 *Ваша ліцензія StaffSpy активована\!*\n\n"
-        f"🔑 Ключ: `{key}`\n"
-        f"🔒 Пароль: `{pwd}`\n\n"
-        f"📦 Тариф: *{tariff['name']}* \({runs} запусків\)\n\n"
-        f"📋 Нижче три файли — інструкція по кожному\."
+        "🎉 Ваша ліцензія StaffSpy активована!\n\n"
+        f"🔑 Ключ: {key}\n"
+        f"🔒 Пароль: {pwd}\n\n"
+        f"📦 Тариф: {tariff['name']} ({runs} запусків)\n\n"
+        "📋 Нижче три файли — інструкція під кожним."
     )
-    await ctx.bot.send_message(client_id, license_text, parse_mode="MarkdownV2")
+    await ctx.bot.send_message(client_id, license_text)
 
     # File 1 - installer.ps1
     try:
-        installer_caption = (
-            "1️⃣ *installer\.ps1* — запустити ПЕРШИМ\, один раз на кожному ПК\n\n"
-            "PowerShell від адміна:
-"
-            "`powershell.exe -ExecutionPolicy Bypass -File "C:\\Users\\ім'я\\Desktop\\installer.ps1"`"
-        )
-        await ctx.bot.send_document(
-            client_id,
-            document=open("installer.ps1", "rb"),
-            caption=installer_caption,
-            parse_mode="MarkdownV2"
-        )
+        cmd1 = 'powershell.exe -ExecutionPolicy Bypass -File "C:\\Users\\name\\Desktop\\installer.ps1"'
+        cap1 = "1️⃣ installer.ps1 — запустити ПЕРШИМ, один раз на кожному ПК\n\nPowerShell від адміна:\n" + cmd1
+        await ctx.bot.send_document(client_id, document=open("installer.ps1", "rb"), caption=cap1)
     except Exception as e:
-        await ctx.bot.send_message(client_id, f"installer.ps1 — запустити першим від адміна")
+        await ctx.bot.send_message(client_id, "installer.ps1 — запустити першим від адміна")
 
     # File 2 - launcher.ps1
     try:
-        launcher_caption = (
-            "2️⃣ *launcher\.ps1* — запускати для отримання звіту\n\n"
-            "PowerShell від адміна:
-"
-            "`powershell.exe -ExecutionPolicy Bypass -File "C:\\Users\\ім'я\\Desktop\\launcher.ps1"`"
-        )
-        await ctx.bot.send_document(
-            client_id,
-            document=InputFile(bytes(launcher_bytes), filename="launcher.ps1"),
-            caption=launcher_caption,
-            parse_mode="MarkdownV2"
-        )
+        cmd2 = 'powershell.exe -ExecutionPolicy Bypass -File "C:\\Users\\name\\Desktop\\launcher.ps1"'
+        cap2 = "2️⃣ launcher.ps1 — запускати для отримання звіту\n\nPowerShell від адміна:\n" + cmd2
+        await ctx.bot.send_document(client_id, document=InputFile(bytes(launcher_bytes), filename="launcher.ps1"), caption=cap2)
     except Exception as e:
-        await ctx.bot.send_message(client_id, f"launcher.ps1 — запускати для звіту")
+        await ctx.bot.send_message(client_id, "launcher.ps1 — запускати для звіту")
 
     # File 3 - manual.html
     try:
-        manual_caption = (
-            "3️⃣ *manual\.html* — інструкція з використання\n\n"
-            "Відкрийте у браузері — там детальний опис кожного кроку\."
-        )
-        await ctx.bot.send_document(
-            client_id,
-            document=open("manual.html", "rb"),
-            caption=manual_caption,
-            parse_mode="MarkdownV2"
-        )
+        cap3 = "3️⃣ manual.html — інструкція з використання\n\nВідкрийте у браузері — там детальний опис кожного кроку."
+        await ctx.bot.send_document(client_id, document=open("manual.html", "rb"), caption=cap3)
     except Exception as e:
         await ctx.bot.send_message(client_id, "manual.html — інструкція")
 
