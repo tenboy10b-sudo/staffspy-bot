@@ -1,4 +1,4 @@
-# StaffSpy - launcher.ps1 v2.0
+# StaffSpy - launcher.ps1 v2.1
 # Run as Administrator
 
 #Requires -RunAsAdministrator
@@ -14,40 +14,30 @@ $LICENSE_PASS  = "XXXXXXXXXX"
 Clear-Host
 Write-Host ""
 Write-Host "  ============================================" -ForegroundColor Yellow
-Write-Host "   StaffSpy - Launcher v2.0" -ForegroundColor Yellow
+Write-Host "   StaffSpy - Launcher v2.1" -ForegroundColor Yellow
 Write-Host "  ============================================" -ForegroundColor Yellow
 Write-Host ""
 
-# Step 1 - Check license
+# Step 1 - Check license via Railway
 Write-Host "  [1/4] Checking license..." -ForegroundColor Cyan
 
 try {
-    $licensesUrl = "https://raw.githubusercontent.com/$GITHUB_OWNER/$GITHUB_REPO/main/licenses.json?t=" + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-    $response    = Invoke-WebRequest -Uri $licensesUrl -UseBasicParsing -TimeoutSec 20
-    $data        = $response.Content | ConvertFrom-Json
-    $license     = $data.licenses | Where-Object { $_.key -eq $LICENSE_KEY -and $_.password -eq $LICENSE_PASS }
+    $checkBody = "{" + [char]34 + "key" + [char]34 + ":" + [char]34 + $LICENSE_KEY + [char]34 + "," + [char]34 + "password" + [char]34 + ":" + [char]34 + $LICENSE_PASS + [char]34 + "}"
+    $checkResp = Invoke-WebRequest -Uri "$RAILWAY_URL/check-license" -Method POST -Body $checkBody -ContentType "application/json" -UseBasicParsing -TimeoutSec 20
+    $checkData = $checkResp.Content | ConvertFrom-Json
 
-    if (-not $license) {
-        Write-Host "  [x] Invalid license key or password." -ForegroundColor Red
-        Read-Host "  Press Enter to exit"
-        exit 1
-    }
-    if (-not $license.active) {
-        Write-Host "  [x] License is deactivated." -ForegroundColor Red
-        Read-Host "  Press Enter to exit"
-        exit 1
-    }
-    if ($license.runs_used -ge $license.runs_max) {
-        Write-Host "  [x] License runs exhausted ($($license.runs_used)/$($license.runs_max))." -ForegroundColor Red
+    if (-not $checkData.valid) {
+        Write-Host "  [x] License error: $($checkData.error)" -ForegroundColor Red
         Read-Host "  Press Enter to exit"
         exit 1
     }
 
-    $runsLeft = $license.runs_max - $license.runs_used
-    Write-Host "  [+] License OK: $($license.owner) | Runs left: $runsLeft" -ForegroundColor Green
+    $runsLeft = $checkData.runs_left
+    Write-Host "  [+] License OK: $($checkData.owner) | Runs left: $runsLeft" -ForegroundColor Green
 
 } catch {
-    Write-Host "  [x] License server error: $_" -ForegroundColor Red
+    Write-Host "  [x] Cannot connect to license server: $_" -ForegroundColor Red
+    Write-Host "  [!] Check internet connection and try again." -ForegroundColor Yellow
     Read-Host "  Press Enter to exit"
     exit 1
 }
@@ -57,7 +47,7 @@ Write-Host "  [2/4] Registering launch..." -ForegroundColor Cyan
 
 try {
     $launchTime  = Get-Date -Format "dd.MM.yyyy HH:mm"
-    $webhookBody = "{" + [char]34 + "action" + [char]34 + ":" + [char]34 + "use_license" + [char]34 + "," + [char]34 + "key" + [char]34 + ":" + [char]34 + $LICENSE_KEY + [char]34 + "," + [char]34 + "owner" + [char]34 + ":" + [char]34 + $license.owner + [char]34 + "," + [char]34 + "launch_time" + [char]34 + ":" + [char]34 + $launchTime + [char]34 + "," + [char]34 + "computer" + [char]34 + ":" + [char]34 + $env:COMPUTERNAME + [char]34 + "," + [char]34 + "user" + [char]34 + ":" + [char]34 + $env:USERNAME + [char]34 + "}"
+    $webhookBody = "{" + [char]34 + "action" + [char]34 + ":" + [char]34 + "use_license" + [char]34 + "," + [char]34 + "key" + [char]34 + ":" + [char]34 + $LICENSE_KEY + [char]34 + "," + [char]34 + "owner" + [char]34 + ":" + [char]34 + $checkData.owner + [char]34 + "," + [char]34 + "launch_time" + [char]34 + ":" + [char]34 + $launchTime + [char]34 + "," + [char]34 + "computer" + [char]34 + ":" + [char]34 + $env:COMPUTERNAME + [char]34 + "," + [char]34 + "user" + [char]34 + ":" + [char]34 + $env:USERNAME + [char]34 + "}"
     Invoke-WebRequest -Uri "$RAILWAY_URL/launch" -Method POST -Body $webhookBody -ContentType "application/json" -UseBasicParsing -TimeoutSec 15 | Out-Null
     Write-Host "  [+] Launch registered" -ForegroundColor Green
 } catch {
@@ -78,7 +68,7 @@ if ($auditCheck -notmatch "Success") {
     Write-Host "  [+] Audit: active" -ForegroundColor Green
 }
 
-# Step 4 - Download and run spy_core
+# Step 4 - Download and run spy_core via Railway proxy
 Write-Host "  [4/4] Loading analysis module..." -ForegroundColor Cyan
 
 $reportDir  = "C:\StaffSpy"
@@ -90,8 +80,9 @@ if (-not (Test-Path $reportDir)) {
 }
 
 try {
-    $coreUrl  = "https://raw.githubusercontent.com/$GITHUB_OWNER/$GITHUB_REPO/main/spy_core.ps1?t=" + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
-    $coreCode = (Invoke-WebRequest -Uri $coreUrl -UseBasicParsing -TimeoutSec 30).Content
+    $coreUrl  = "$RAILWAY_URL/get-core?key=$LICENSE_KEY&password=$LICENSE_PASS"
+    $coreResp = Invoke-WebRequest -Uri $coreUrl -UseBasicParsing -TimeoutSec 30
+    $coreCode = $coreResp.Content
 
     if (-not $coreCode -or $coreCode.Length -lt 100) {
         Write-Host "  [x] Failed to load analysis module." -ForegroundColor Red
