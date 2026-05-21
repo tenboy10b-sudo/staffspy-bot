@@ -110,8 +110,8 @@ def gen_password() -> str:
 # ══════════════════════════════════════════════════════════════
 def kb_main(is_admin=False):
     rows = [
-        [InlineKeyboardButton("🛒 Придбати ліцензію", callback_data="buy")],
-        [InlineKeyboardButton("🎯 Демо версія",        callback_data="demo")],
+        [InlineKeyboardButton("🎯 Безкоштовне демо",   callback_data="demo")],
+        [InlineKeyboardButton("🛒 Придбати ліцензію",  callback_data="buy")],
         [InlineKeyboardButton("📋 Мої ліцензії",       callback_data="my_licenses")],
         [InlineKeyboardButton("❓ Підтримка",           callback_data="support")],
     ]
@@ -425,9 +425,9 @@ async def cb_issue_license(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await q.message.reply_text(f"❌ Помилка запису в GitHub: {e}")
         return
 
-    # Підготувати launcher.ps1 з вставленими даними
+    # Prepare launcher.ps1 with license data
     try:
-        with open("launcher.ps1", "r", encoding="utf-8") as f:
+        with open("launcher.ps1", "r", encoding="utf-8-sig") as f:
             launcher_code = f.read()
 
         launcher_code = launcher_code.replace('$LICENSE_KEY   = "XXXX-XXXX-XXXX-XXXX"', f'$LICENSE_KEY   = "{key}"')
@@ -436,41 +436,69 @@ async def cb_issue_license(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             '$RAILWAY_URL   = "https://YOUR-PROJECT.up.railway.app"',
             f'$RAILWAY_URL   = "{os.environ.get("RAILWAY_URL", "https://your-railway-url.up.railway.app")}"'
         )
-
-        launcher_bytes = launcher_code.encode("utf-8-sig")  # BOM для PowerShell
+        launcher_bytes = launcher_code.encode("utf-8-sig")
     except Exception as e:
         await q.message.reply_text(f"❌ Помилка підготовки launcher: {e}")
         return
 
-    # Відправити клієнту
+    # Send license info
     license_text = (
-        f"🎉 *Ваша ліцензія StaffSpy активована!*\n\n"
+        f"🎉 *Ваша ліцензія StaffSpy активована\!*\n\n"
         f"🔑 Ключ: `{key}`\n"
         f"🔒 Пароль: `{pwd}`\n\n"
-        f"📦 Тариф: *{tariff['name']}* ({runs} запусків)\n\n"
-        f"📁 *У архіві нижче:*\n"
-        f"• `installer.ps1` — встановити один раз\n"
-        f"• `launcher.ps1` — запускати для звіту\n"
-        f"• `manual.html` — інструкція\n\n"
-        f"_Зберігайте ключ і пароль в надійному місці._"
+        f"📦 Тариф: *{tariff['name']}* \({runs} запусків\)\n\n"
+        f"📋 Нижче три файли — інструкція по кожному\."
     )
+    await ctx.bot.send_message(client_id, license_text, parse_mode="MarkdownV2")
 
-    await ctx.bot.send_message(client_id, license_text, parse_mode="Markdown")
-
-    # Надіслати файли
-    await ctx.bot.send_document(client_id, document=InputFile(
-        bytes(launcher_bytes), filename="launcher.ps1"
-    ), caption="▶️ Запустіть цей файл для отримання звіту")
-
+    # File 1 - installer.ps1
     try:
-        await ctx.bot.send_document(client_id,
+        installer_caption = (
+            "1️⃣ *installer\.ps1* — запустити ПЕРШИМ\, один раз на кожному ПК\n\n"
+            "PowerShell від адміна:
+"
+            "`powershell.exe -ExecutionPolicy Bypass -File "C:\\Users\\ім'я\\Desktop\\installer.ps1"`"
+        )
+        await ctx.bot.send_document(
+            client_id,
             document=open("installer.ps1", "rb"),
-            caption="⚙️ Встановіть цей файл ПЕРШИМ (один раз від адміна)")
-        await ctx.bot.send_document(client_id,
+            caption=installer_caption,
+            parse_mode="MarkdownV2"
+        )
+    except Exception as e:
+        await ctx.bot.send_message(client_id, f"installer.ps1 — запустити першим від адміна")
+
+    # File 2 - launcher.ps1
+    try:
+        launcher_caption = (
+            "2️⃣ *launcher\.ps1* — запускати для отримання звіту\n\n"
+            "PowerShell від адміна:
+"
+            "`powershell.exe -ExecutionPolicy Bypass -File "C:\\Users\\ім'я\\Desktop\\launcher.ps1"`"
+        )
+        await ctx.bot.send_document(
+            client_id,
+            document=InputFile(bytes(launcher_bytes), filename="launcher.ps1"),
+            caption=launcher_caption,
+            parse_mode="MarkdownV2"
+        )
+    except Exception as e:
+        await ctx.bot.send_message(client_id, f"launcher.ps1 — запускати для звіту")
+
+    # File 3 - manual.html
+    try:
+        manual_caption = (
+            "3️⃣ *manual\.html* — інструкція з використання\n\n"
+            "Відкрийте у браузері — там детальний опис кожного кроку\."
+        )
+        await ctx.bot.send_document(
+            client_id,
             document=open("manual.html", "rb"),
-            caption="📋 Інструкція з використання")
-    except Exception:
-        pass
+            caption=manual_caption,
+            parse_mode="MarkdownV2"
+        )
+    except Exception as e:
+        await ctx.bot.send_message(client_id, "manual.html — інструкція")
 
     # Повідомити адміна
     await q.edit_message_caption(
