@@ -183,12 +183,12 @@ HEADER_PLACEHOLDER
 </body></html>
 "@
 
-$osCard   = "<div class=card><div class=card-l>OS</div><div class=card-v style=" + [char]39 + "font-size:.82rem" + [char]39 + ">" + $osName + "</div></div>"
-$ramCard  = "<div class=card><div class=card-l>RAM</div><div class=card-v>" + $ramGB + " GB</div></div>"
-$upCard   = "<div class=card><div class=card-l>Uptime</div><div class=card-v style=" + [char]39 + "font-size:.95rem" + [char]39 + ">" + $uptimeStr + "</div></div>"
-$prcCard  = "<div class=card><div class=card-l>Processes</div><div class=card-v>" + $processes.Count + "</div></div>"
-$swCard   = "<div class=card><div class=card-l>Software</div><div class=card-v>" + $software.Count + "</div></div>"
-$usbCard  = "<div class=card><div class=card-l>USB</div><div class=card-v>" + $usbCount + "</div></div>"
+$osCard   = "<div class=card><div class=card-l>&#1054;&#1057;</div><div class=card-v style=" + [char]39 + "font-size:.82rem" + [char]39 + ">" + $osName + "</div></div>"
+$ramCard  = "<div class=card><div class=card-l>&#1054;&#1087;&#1077;&#1088;&#1072;&#1090;&#1080;&#1074;&#1085;&#1072; &#1087;&#1072;&#1084;&#8217;&#1103;&#1090;&#1100;</div><div class=card-v>" + $ramGB + " GB</div></div>"
+$upCard   = "<div class=card><div class=card-l>&#1040;&#1087;&#1090;&#1072;&#1081;&#1084;</div><div class=card-v style=" + [char]39 + "font-size:.95rem" + [char]39 + ">" + $uptimeStr + "</div></div>"
+$prcCard  = "<div class=card><div class=card-l>&#1055;&#1088;&#1086;&#1094;&#1077;&#1089;&#1110;&#1074;</div><div class=card-v>" + $processes.Count + "</div></div>"
+$swCard   = "<div class=card><div class=card-l>&#1055;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;</div><div class=card-v>" + $software.Count + "</div></div>"
+$usbCard  = "<div class=card><div class=card-l>USB-&#1087;&#1088;&#1080;&#1089;&#1090;&#1088;&#1086;&#1111;</div><div class=card-v>" + $usbCount + "</div></div>"
 
 $headerHtml = "<div class=header><div><div class=logo>Staff<span>Spy</span><span class=badge>DEMO</span></div></div><div class=meta>" + $now + " | " + $pc + "<br>" + $usr + " | " + $osName + "</div></div>"
 $cardsHtml  = $osCard + $ramCard + $upCard + $prcCard + $swCard + $usbCard
