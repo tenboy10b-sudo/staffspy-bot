@@ -109,6 +109,7 @@ body {
   align-items: start;
   transition: box-shadow .2s, border-color .2s;
   box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  min-width: 0;
 }
 .step:hover {
   border-color: #fde68a;
@@ -180,12 +181,13 @@ body {
   background: #0f172a;
   border-radius: 9px;
   padding: .9rem 1.1rem;
-  font-size: .7rem;
+  font-size: .65rem;
   color: #7dd3fc;
   margin-top: .7rem;
   overflow-x: auto;
-  white-space: pre;
-  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.7;
   font-family: 'Courier New', monospace;
   box-shadow: inset 0 2px 4px rgba(0,0,0,.2);
 }
@@ -321,6 +323,22 @@ footer {
   border-top: 1px solid #e2e8f0;
   background: #fff;
   margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .hero { padding: 2rem 1.2rem 1.8rem; }
+  .logo { font-size: 1.8rem; }
+  .container { padding: 1.5rem 1rem; }
+  .step { grid-template-columns: 40px 1fr; gap: .8rem; padding: 1.1rem 1rem; }
+  .step-num { width: 40px; height: 40px; font-size: .95rem; border-radius: 9px; }
+  .step-title { font-size: .72rem; }
+  .step-desc { font-size: .68rem; }
+  .code-block { font-size: .6rem; padding: .7rem .8rem; }
+  .report-features { grid-template-columns: 1fr 1fr; }
+  .err-table { font-size: .62rem; }
+  .err-table th, .err-table td { padding: .6rem .7rem; }
+  .support-box { padding: 1.5rem 1rem; }
+  .support-title { font-size: .85rem; }
 }
 </style>
 </head>
