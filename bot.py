@@ -786,6 +786,80 @@ async def webhook_launch(request: Request):
 async def health():
     return {"status": "ok", "service": "StaffSpy Bot"}
 
+@web_app.get("/get-core")
+async def get_core(key: str = "", password: str = ""):
+    try:
+        if not key or not password:
+            return {"error": "Missing params"}
+
+        # Verify license first
+        lic_data, _ = await gh_get_file("licenses.json")
+        license = None
+        for l in lic_data.get("licenses", []):
+            if l.get("key") == key and l.get("password") == password:
+                license = l
+                break
+
+        if not license or not license.get("active") or license.get("runs_used", 0) >= license.get("runs_max", 0):
+            from fastapi.responses import PlainTextResponse
+            return PlainTextResponse("# Invalid license", status_code=403)
+
+        # Return spy_core.ps1 content
+        from fastapi.responses import PlainTextResponse
+        core_data = await gh_get_file("spy_core.ps1")
+        # gh_get_file returns (parsed_json, sha) but spy_core is PS not JSON
+        # Need raw content
+        url = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/contents/spy_core.ps1"
+        async with httpx.AsyncClient() as c:
+            r = await c.get(url, headers=GH_HEADERS, timeout=15)
+            r.raise_for_status()
+            import base64 as b64
+            raw = b64.b64decode(r.json()["content"]).decode("utf-8")
+        return PlainTextResponse(raw, status_code=200)
+
+    except Exception as e:
+        log.error(f"get-core error: {e}")
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse(f"# Error: {e}", status_code=500)
+
+@web_app.post("/check-license")
+async def check_license(request: Request):
+    try:
+        body = await request.json()
+        key  = body.get("key", "")
+        pwd  = body.get("password", "")
+
+        if not key or not pwd:
+            return {"valid": False, "error": "Missing key or password"}
+
+        lic_data, _ = await gh_get_file("licenses.json")
+        license = None
+        for l in lic_data.get("licenses", []):
+            if l.get("key") == key and l.get("password") == pwd:
+                license = l
+                break
+
+        if not license:
+            return {"valid": False, "error": "Invalid key or password"}
+        if not license.get("active", False):
+            return {"valid": False, "error": "License deactivated"}
+
+        runs_used = license.get("runs_used", 0)
+        runs_max  = license.get("runs_max", 0)
+        if runs_used >= runs_max:
+            return {"valid": False, "error": f"Runs exhausted ({runs_used}/{runs_max})"}
+
+        return {
+            "valid":     True,
+            "owner":     license.get("owner", ""),
+            "runs_left": runs_max - runs_used,
+            "runs_max":  runs_max
+        }
+
+    except Exception as e:
+        log.error(f"check-license error: {e}")
+        return {"valid": False, "error": str(e)}
+
 # ══════════════════════════════════════════════════════════════
 #  НАВІГАЦІЯ (back кнопки)
 # ══════════════════════════════════════════════════════════════
