@@ -1,5 +1,4 @@
 # StaffSpy - audit_demo.ps1 v2.0
-
 $ErrorActionPreference = "SilentlyContinue"
 $RAILWAY_URL = "https://web-production-b6c66.up.railway.app"
 $ReportPath  = "$env:USERPROFILE\Desktop\StaffSpy_DEMO.html"
@@ -16,7 +15,6 @@ $uptime = (Get-Date) - $os.ConvertToDateTime($os.LastBootUpTime)
 $uptimeStr = "$([int]$uptime.TotalHours) год $($uptime.Minutes) хв"
 $ramGB  = [math]::Round($cs.TotalPhysicalMemory / 1GB, 1)
 $osName = $os.Caption
-
 Write-Host "  [+] Система: OK" -ForegroundColor Green
 
 Write-Host "  [*] Збираю встановлене ПЗ..." -ForegroundColor Cyan
@@ -69,7 +67,6 @@ $processes = Get-WmiObject Win32_Process | ForEach-Object {
         MemMB = [math]::Round($_.WorkingSetSize / 1MB, 1)
     }
 } | Where-Object { $_ -ne $null -and $_.Name } | Sort-Object MemMB -Descending
-
 Write-Host "  [+] Процесiв: $($processes.Count)" -ForegroundColor Green
 
 Write-Host "  [*] Збираю USB iсторiю..." -ForegroundColor Cyan
@@ -88,34 +85,48 @@ try {
 Write-Host "  [+] USB: $($usbDevices.Count)" -ForegroundColor Green
 
 try {
-    $wh = '{"key":"DEMO","owner":"' + $env:USERNAME + '","computer":"' + $env:COMPUTERNAME + '","demo":true}'
-    Invoke-WebRequest -Uri "$RAILWAY_URL/launch" -Method POST -Body $wh -ContentType "application/json" -UseBasicParsing -TimeoutSec 8 | Out-Null
+    $whKey  = "DEMO"
+    $whUser = $env:USERNAME
+    $whComp = $env:COMPUTERNAME
+    $whBody = "{`"key`":`"$whKey`",`"owner`":`"$whUser`",`"computer`":`"$whComp`",`"demo`":true}"
+    Invoke-WebRequest -Uri "$RAILWAY_URL/launch" -Method POST -Body $whBody -ContentType "application/json" -UseBasicParsing -TimeoutSec 8 | Out-Null
 } catch {}
 
 Write-Host "  [*] Генерую звiт..." -ForegroundColor Cyan
 $now = Get-Date -Format "dd.MM.yyyy HH:mm"
 
+function Escape-Html {
+    param([string]$s)
+    $s = $s -replace [regex]::Escape("&"), "AMP_PLACEHOLDER"
+    $s = $s -replace "<", "LT_PLACEHOLDER"
+    $s = $s -replace ">", "GT_PLACEHOLDER"
+    $s = $s -replace "AMP_PLACEHOLDER", "&amp;"
+    $s = $s -replace "LT_PLACEHOLDER", "&lt;"
+    $s = $s -replace "GT_PLACEHOLDER", "&gt;"
+    return $s
+}
+
 $swRows = ($software | Select-Object -First 50 | ForEach-Object {
-    $n = $_.Name    -replace "&","&amp;" -replace "<","&lt;" -replace ">","&gt;"
-    $v = $_.Version -replace "&","&amp;" -replace "<","&lt;" -replace ">","&gt;"
-    $p = $_.Publisher -replace "&","&amp;" -replace "<","&lt;" -replace ">","&gt;"
+    $n = Escape-Html $_.Name
+    $v = Escape-Html $_.Version
+    $p = Escape-Html $_.Publisher
     "<tr><td>$n</td><td>$v</td><td>$p</td><td>$($_.InstDate)</td></tr>"
-}) -join ""
+}) -join "`n"
 
 $procRows = ($processes | Select-Object -First 40 | ForEach-Object {
-    $n = $_.Name -replace "&","&amp;" -replace "<","&lt;" -replace ">","&gt;"
-    $u = $_.User -replace "&","&amp;" -replace "<","&lt;" -replace ">","&gt;"
+    $n = Escape-Html $_.Name
+    $u = Escape-Html $_.User
     "<tr><td>$n</td><td>$($_.PID)</td><td>$u</td><td>$($_.Start)</td><td>$($_.MemMB) MB</td></tr>"
-}) -join ""
+}) -join "`n"
 
 $usbRows = if ($usbDevices.Count -gt 0) {
     ($usbDevices | ForEach-Object {
-        $d = $_.Device -replace "&","&amp;" -replace "<","&lt;" -replace ">","&gt;"
+        $d = Escape-Html $_.Device
         "<tr><td>$d</td><td style='color:#94a3b8;font-size:.65rem'>$($_.ID)</td></tr>"
-    }) -join ""
+    }) -join "`n"
 } else { "<tr><td colspan='2' style='text-align:center;color:#94a3b8;padding:1.5rem'>USB-пристроїв не знайдено</td></tr>" }
 
-$html = @"
+$htmlContent = @"
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -151,7 +162,7 @@ tbody tr:hover td { background: #fffbeb; }
 .mod { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: .7rem 1rem; font-size: .65rem; display: flex; align-items: center; gap: .6rem; color: #334155; }
 .mod.ok { border-color: #bbf7d0; color: #16a34a; background: #f0fdf4; }
 .mod.locked { color: #94a3b8; }
-.mod .tag { font-size: .52rem; padding: .1rem .4rem; border-radius: 4px; font-weight: 700; }
+.tag { font-size: .52rem; padding: .1rem .4rem; border-radius: 4px; font-weight: 700; }
 .mod.ok .tag { background: #dcfce7; color: #16a34a; }
 .mod.locked .tag { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
 .upsell { background: linear-gradient(135deg, #fffbeb 0%, #eff6ff 100%); border: 2px solid #fde68a; border-radius: 16px; padding: 2rem; text-align: center; margin: 0 2rem 2rem; }
@@ -169,23 +180,21 @@ footer { text-align: center; padding: 1.5rem; color: #94a3b8; font-size: .62rem;
   </div>
   <div class="meta">$now | $($env:COMPUTERNAME)<br>$($env:USERNAME) | $osName</div>
 </div>
-
 <div class="cards">
-  <div class="card"><div class="card-l">ОС</div><div class="card-v" style="font-size:.85rem;margin-top:.2rem">$osName</div></div>
-  <div class="card"><div class="card-l">RAM</div><div class="card-v">$ramGB <span style="font-size:.9rem">ГБ</span></div></div>
+  <div class="card"><div class="card-l">ОС</div><div class="card-v" style="font-size:.85rem">$osName</div></div>
+  <div class="card"><div class="card-l">RAM</div><div class="card-v">$ramGB ГБ</div></div>
   <div class="card"><div class="card-l">Аптайм</div><div class="card-v" style="font-size:.95rem">$uptimeStr</div></div>
   <div class="card"><div class="card-l">Процесiв</div><div class="card-v">$($processes.Count)</div></div>
   <div class="card"><div class="card-l">Програм</div><div class="card-v">$($software.Count)</div></div>
   <div class="card"><div class="card-l">USB</div><div class="card-v">$($usbDevices.Count)</div></div>
 </div>
-
 <div class="section"><h2>Модулi</h2></div>
 <div class="modules">
   <div class="mod ok"><span class="tag">OK</span> Iнформацiя про систему</div>
   <div class="mod ok"><span class="tag">OK</span> Встановлене ПЗ</div>
   <div class="mod ok"><span class="tag">OK</span> Активнi процеси</div>
   <div class="mod ok"><span class="tag">OK</span> USB-пристрої</div>
-  <div class="mod locked"><span class="tag">lock</span> Журнал запускiв програм</div>
+  <div class="mod locked"><span class="tag">lock</span> Журнал запускiв</div>
   <div class="mod locked"><span class="tag">lock</span> Час запуску i закриття</div>
   <div class="mod locked"><span class="tag">lock</span> Тривалiсть роботи</div>
   <div class="mod locked"><span class="tag">lock</span> Активнiсть по днях</div>
@@ -194,49 +203,37 @@ footer { text-align: center; padding: 1.5rem; color: #94a3b8; font-size: .62rem;
   <div class="mod locked"><span class="tag">lock</span> Експорт в Excel</div>
   <div class="mod locked"><span class="tag">lock</span> + ще 11 модулiв...</div>
 </div>
-
 <div class="section">
   <h2>Встановленi програми (першi 50)</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Назва</th><th>Версiя</th><th>Видавець</th><th>Дата встановлення</th></tr></thead>
-      <tbody>$swRows</tbody>
-    </table>
-  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Назва</th><th>Версiя</th><th>Видавець</th><th>Дата встановлення</th></tr></thead>
+    <tbody>$swRows</tbody>
+  </table></div>
 </div>
-
 <div class="section">
   <h2>Активнi процеси</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Процес</th><th>PID</th><th>Користувач</th><th>Запуск</th><th>Пам'ять</th></tr></thead>
-      <tbody>$procRows</tbody>
-    </table>
-  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Процес</th><th>PID</th><th>Користувач</th><th>Запуск</th><th>Пам'ять</th></tr></thead>
+    <tbody>$procRows</tbody>
+  </table></div>
 </div>
-
 <div class="section">
   <h2>Iсторiя USB-пристроїв</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Пристрiй</th><th>ID</th></tr></thead>
-      <tbody>$usbRows</tbody>
-    </table>
-  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Пристрiй</th><th>ID</th></tr></thead>
+    <tbody>$usbRows</tbody>
+  </table></div>
 </div>
-
 <div class="upsell">
   <h3>Хочете бачити повну картину?</h3>
-  <p>Повна версiя показує: якi програми запускались i коли, хто i скiльки працював,<br>детальний звiт за будь-який перiод з фiльтрами, сортуванням i експортом в Excel.</p>
+  <p>Повна версiя: якi програми запускались i коли, хто i скiльки працював,<br>детальний звiт за будь-який перiод з фiльтрами та експортом в Excel.</p>
   <a href="https://t.me/StaffSpy_01_Bot">Отримати повну версiю</a>
 </div>
-
 <footer>StaffSpy DEMO v2.0 | $now | $($env:COMPUTERNAME)</footer>
-</body>
-</html>
+</body></html>
 "@
 
-$html | Out-File -FilePath $ReportPath -Encoding UTF8 -Force
+$htmlContent | Out-File -FilePath $ReportPath -Encoding UTF8 -Force
 Start-Process $ReportPath
 Write-Host "  [OK] Демо звiт збережено на Робочому столi" -ForegroundColor Green
 Write-Host "  StaffSpy_DEMO.html" -ForegroundColor Cyan
