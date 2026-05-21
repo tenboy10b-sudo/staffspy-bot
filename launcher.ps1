@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $GITHUB_OWNER  = "tenboy10b-sudo"
 $GITHUB_REPO   = "staffspy-private"
-$RAILWAY_URL   = "https://YOUR-PROJECT.up.railway.app"
+$RAILWAY_URL   = "https://web-production-b6c66.up.railway.app"
 $LICENSE_KEY   = "XXXX-XXXX-XXXX-XXXX"
 $LICENSE_PASS  = "XXXXXXXXXX"
 
