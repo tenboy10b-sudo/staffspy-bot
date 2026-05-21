@@ -379,8 +379,12 @@ footer {
           <div class="step-title">Запустіть installer.ps1 від Адміністратора</div>
           <div class="step-desc">
             Це потрібно зробити <b>один раз</b> на кожному комп'ютері який хочете відстежувати.<br><br>
-            <b>Правий клік</b> на файл <b>installer.ps1</b> → вибрати <b>"Запустити як адміністратор"</b>
+            <b>Спосіб 1 —</b> Правий клік на файл <b>installer.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
+            <b>Спосіб 2 —</b> Відкрити PowerShell від Адміністратора і виконати:
           </div>
+          <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force<span class="code-comment">
+# Потім запустити файл (вкажіть свій шлях):</span>
+<span class="code-cmd">C:\Users\Ім'я\Desktop\installer.ps1</span></div>
           <div class="warn-box">
             <span class="warn-icon">⚠️</span>
             Якщо Windows запитає "Дозволити програмі вносити зміни?" — натисніть <b>Так</b>
@@ -413,8 +417,9 @@ footer {
           </div>
           <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope LocalMachine</div>
           <div class="step-desc" style="margin-top:.6rem">
-            Після цього запустіть installer.ps1 знову.
+            Після цього запустіть потрібний файл знову — через правий клік або командою:
           </div>
+          <div class="code-block"><span class="code-cmd">C:\Users\Ім'я\Desktop\installer.ps1</span></div>
         </div>
       </div>
 
@@ -432,8 +437,12 @@ footer {
           <div class="step-title">Через тиждень — запустіть launcher.ps1</div>
           <div class="step-desc">
             Можна запускати в будь-який момент — хоч через день, хоч через місяць.<br><br>
-            <b>Правий клік</b> на файл <b>launcher.ps1</b> → <b>"Запустити як адміністратор"</b>
+            <b>Спосіб 1 —</b> Правий клік на файл <b>launcher.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
+            <b>Спосіб 2 —</b> Відкрити PowerShell від Адміністратора і виконати:
           </div>
+          <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force<span class="code-comment">
+# Потім запустити файл (вкажіть свій шлях):</span>
+<span class="code-cmd">C:\Users\Ім'я\Desktop\launcher.ps1</span></div>
         </div>
       </div>
 
