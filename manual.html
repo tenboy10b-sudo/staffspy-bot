@@ -382,9 +382,7 @@ footer {
             <b>Спосіб 1 —</b> Правий клік на файл <b>installer.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
             <b>Спосіб 2 —</b> Відкрити PowerShell від Адміністратора і виконати:
           </div>
-          <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force<span class="code-comment">
-# Потім запустити файл (вкажіть свій шлях):</span>
-<span class="code-cmd">C:\Users\Ім'я\Desktop\installer.ps1</span></div>
+          <div class="code-block"><span class="code-cmd">powershell.exe</span> -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</div>
           <div class="warn-box">
             <span class="warn-icon">⚠️</span>
             Якщо Windows запитає "Дозволити програмі вносити зміни?" — натисніть <b>Так</b>
@@ -415,11 +413,11 @@ footer {
           <div class="step-desc">
             Відкрийте <b>PowerShell від Адміністратора</b> і виконайте одну команду:
           </div>
-          <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope LocalMachine</div>
+          <div class="code-block"><span class="code-cmd">powershell.exe</span> -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</div>
           <div class="step-desc" style="margin-top:.6rem">
             Після цього запустіть потрібний файл знову — через правий клік або командою:
           </div>
-          <div class="code-block"><span class="code-cmd">C:\Users\Ім'я\Desktop\installer.ps1</span></div>
+          
         </div>
       </div>
 
@@ -440,9 +438,7 @@ footer {
             <b>Спосіб 1 —</b> Правий клік на файл <b>launcher.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
             <b>Спосіб 2 —</b> Відкрити PowerShell від Адміністратора і виконати:
           </div>
-          <div class="code-block"><span class="code-cmd">Set-ExecutionPolicy</span> -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force<span class="code-comment">
-# Потім запустити файл (вкажіть свій шлях):</span>
-<span class="code-cmd">C:\Users\Ім'я\Desktop\launcher.ps1</span></div>
+          <div class="code-block"><span class="code-cmd">powershell.exe</span> -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\launcher.ps1"</div>
         </div>
       </div>
 
@@ -567,7 +563,7 @@ footer {
         <tbody>
           <tr>
             <td class="err-err">Виконання скриптів відключено</td>
-            <td class="err-fix">PowerShell від адміна → Set-ExecutionPolicy RemoteSigned</td>
+            <td class="err-fix">powershell.exe -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</td>
           </tr>
           <tr>
             <td class="err-err">Аудит не налаштовано</td>
