@@ -5,106 +5,81 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>StaffSpy — Інструкція</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
-:root {
-  --bg:      #07090c;
-  --s1:      #0d1117;
-  --s2:      #111820;
-  --border:  #1a2332;
-  --accent:  #f59e0b;
-  --green:   #10b981;
-  --red:     #ef4444;
-  --blue:    #3b82f6;
-  --text:    #e2e8f0;
-  --muted:   #4b6080;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
+  background: #f0f4f8;
+  color: #1e293b;
+  font-family: 'Inter', sans-serif;
   line-height: 1.7;
   min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 70% 40% at 100% 0%, rgba(245,158,11,.06) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 0% 100%, rgba(59,130,246,.04) 0%, transparent 60%);
 }
 
 /* HERO */
 .hero {
-  padding: 4rem 2rem 3rem;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 3.5rem 2rem 2.5rem;
   text-align: center;
-  position: relative;
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(245,158,11,.07) 0%, transparent 70%);
-  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
 }
 
 .logo {
   font-family: 'Unbounded', sans-serif;
-  font-size: 2.8rem;
-  font-weight: 900;
-  letter-spacing: -.04em;
-  color: #fff;
-  margin-bottom: .5rem;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: .4rem;
+  letter-spacing: -.03em;
 }
-.logo span { color: var(--accent); }
+.logo span { color: #f59e0b; }
 
 .tagline {
-  font-size: .75rem;
-  color: var(--muted);
+  font-size: .7rem;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: .2em;
   margin-bottom: 2rem;
+  font-weight: 600;
 }
 
 .hero-badges {
   display: flex;
   justify-content: center;
-  gap: .75rem;
+  gap: .6rem;
   flex-wrap: wrap;
 }
 .badge {
-  background: var(--s1);
-  border: 1px solid var(--border);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 100px;
   padding: .35rem 1rem;
   font-size: .65rem;
-  color: var(--muted);
+  color: #64748b;
   display: flex;
   align-items: center;
   gap: .4rem;
+  font-weight: 500;
 }
-.badge b { color: var(--accent); }
+.badge b { color: #f59e0b; }
 
 /* CONTAINER */
 .container {
   max-width: 860px;
   margin: 0 auto;
-  padding: 3rem 2rem;
+  padding: 2.5rem 2rem;
 }
 
-/* SECTION */
-.section {
-  margin-bottom: 3rem;
-}
-
+/* SECTION LABEL */
 .section-label {
   font-family: 'Unbounded', sans-serif;
   font-size: .6rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .2em;
-  color: var(--accent);
+  color: #f59e0b;
   margin-bottom: 1.2rem;
   display: flex;
   align-items: center;
@@ -113,120 +88,109 @@ body {
 .section-label::after {
   content: '';
   flex: 1;
-  height: 1px;
-  background: var(--border);
+  height: 2px;
+  background: #f1f5f9;
+  border-radius: 2px;
 }
+
+.section { margin-bottom: 3rem; }
 
 /* STEPS */
-.steps {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+.steps { display: flex; flex-direction: column; gap: 1rem; }
 
 .step {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
   padding: 1.4rem 1.6rem;
   display: grid;
-  grid-template-columns: 48px 1fr;
+  grid-template-columns: 52px 1fr;
   gap: 1.2rem;
   align-items: start;
-  position: relative;
-  overflow: hidden;
-  transition: border-color .2s;
+  transition: box-shadow .2s, border-color .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
-.step:hover { border-color: rgba(245,158,11,.3); }
-.step::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: var(--accent);
-  opacity: 0;
-  transition: opacity .2s;
+.step:hover {
+  border-color: #fde68a;
+  box-shadow: 0 4px 12px rgba(245,158,11,.1);
 }
-.step:hover::before { opacity: 1; }
 
 .step-num {
-  width: 48px; height: 48px;
-  background: rgba(245,158,11,.1);
-  border: 1px solid rgba(245,158,11,.2);
-  border-radius: 10px;
+  width: 52px; height: 52px;
+  background: #fef9c3;
+  border: 2px solid #fde68a;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Unbounded', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: var(--accent);
+  color: #92400e;
   flex-shrink: 0;
 }
 
 .step-title {
   font-family: 'Unbounded', sans-serif;
-  font-size: .8rem;
-  font-weight: 600;
-  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  color: #0f172a;
   margin-bottom: .5rem;
   letter-spacing: -.01em;
 }
 
 .step-desc {
   font-size: .72rem;
-  color: var(--muted);
-  line-height: 1.7;
+  color: #64748b;
+  line-height: 1.75;
 }
+.step-desc b { color: #1e293b; }
 
-.step-desc b { color: var(--text); }
-
-/* WARNING BOX */
+/* WARN BOX */
 .warn-box {
-  background: rgba(245,158,11,.06);
-  border: 1px solid rgba(245,158,11,.2);
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 9px;
+  padding: .9rem 1.1rem;
   font-size: .7rem;
-  color: #d97706;
+  color: #92400e;
   display: flex;
-  gap: .8rem;
+  gap: .7rem;
   align-items: flex-start;
   margin-top: .8rem;
 }
-.warn-icon { font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+.warn-icon { font-size: 1rem; flex-shrink: 0; }
 
 /* INFO BOX */
 .info-box {
-  background: rgba(59,130,246,.06);
-  border: 1px solid rgba(59,130,246,.2);
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 9px;
+  padding: .9rem 1.1rem;
   font-size: .7rem;
-  color: #60a5fa;
+  color: #1d4ed8;
   display: flex;
-  gap: .8rem;
+  gap: .7rem;
   align-items: flex-start;
   margin-top: .8rem;
 }
 
 /* CODE BLOCK */
 .code-block {
-  background: #060a0f;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .8rem 1rem;
-  font-size: .68rem;
+  background: #0f172a;
+  border-radius: 9px;
+  padding: .9rem 1.1rem;
+  font-size: .7rem;
   color: #7dd3fc;
-  margin-top: .6rem;
+  margin-top: .7rem;
   overflow-x: auto;
   white-space: pre;
   line-height: 1.6;
+  font-family: 'Courier New', monospace;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.2);
 }
-.code-comment { color: #334155; }
-.code-cmd     { color: var(--accent); }
 
-/* REPORT PREVIEW */
+/* FEATURES GRID */
 .report-features {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -235,126 +199,133 @@ body {
 }
 
 .feat-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  transition: box-shadow .2s;
 }
-.feat-icon { font-size: 1.4rem; margin-bottom: .5rem; }
+.feat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.feat-icon { font-size: 1.5rem; margin-bottom: .5rem; }
 .feat-title {
   font-family: 'Unbounded', sans-serif;
   font-size: .65rem;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 700;
+  color: #0f172a;
   margin-bottom: .3rem;
 }
-.feat-desc { font-size: .62rem; color: var(--muted); }
+.feat-desc { font-size: .65rem; color: #64748b; line-height: 1.6; }
 
 /* FAQ */
-.faq { display: flex; flex-direction: column; gap: .75rem; }
+.faq { display: flex; flex-direction: column; gap: .6rem; }
 
 .faq-item {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
 .faq-q {
   padding: 1rem 1.2rem;
   font-size: .72rem;
-  color: var(--text);
+  color: #1e293b;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   user-select: none;
   transition: background .15s;
+  font-weight: 500;
 }
-.faq-q:hover { background: var(--s2); }
-.faq-q b { color: var(--accent); margin-right: .5rem; }
-.faq-arrow { color: var(--muted); transition: transform .2s; font-size: .8rem; }
+.faq-q:hover { background: #fafafa; }
+.faq-q b { color: #f59e0b; margin-right: .5rem; }
+.faq-arrow { color: #94a3b8; transition: transform .2s; font-size: .75rem; }
 .faq-item.open .faq-arrow { transform: rotate(180deg); }
 .faq-a {
   padding: 0 1.2rem;
   max-height: 0;
   overflow: hidden;
   transition: max-height .3s ease, padding .3s;
-  font-size: .68rem;
-  color: var(--muted);
+  font-size: .7rem;
+  color: #64748b;
   line-height: 1.8;
 }
-.faq-item.open .faq-a { max-height: 200px; padding: .8rem 1.2rem 1rem; }
+.faq-item.open .faq-a { max-height: 200px; padding: .5rem 1.2rem 1.1rem; }
 
 /* ERROR TABLE */
-.err-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .68rem;
-  margin-top: 1rem;
+.err-wrap {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
+.err-table { width: 100%; border-collapse: collapse; font-size: .7rem; }
 .err-table th {
-  background: #060a0f;
-  color: var(--muted);
+  background: #f8fafc;
+  color: #64748b;
   text-align: left;
-  padding: .7rem 1rem;
-  font-size: .58rem;
+  padding: .75rem 1rem;
+  font-size: .6rem;
   text-transform: uppercase;
   letter-spacing: .1em;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
 }
-.err-table td {
-  padding: .7rem 1rem;
-  border-bottom: 1px solid rgba(26,35,50,.6);
-  vertical-align: top;
-}
+.err-table td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: top; line-height: 1.6; }
 .err-table tr:last-child td { border-bottom: none; }
-.err-table tr:hover td { background: var(--s2); }
-.err-err { color: var(--red); }
-.err-fix { color: var(--green); }
+.err-table tr:hover td { background: #fafafa; }
+.err-err { color: #dc2626; font-weight: 500; }
+.err-fix { color: #16a34a; }
 
 /* SUPPORT */
 .support-box {
-  background: linear-gradient(135deg, rgba(245,158,11,.08) 0%, rgba(59,130,246,.05) 100%);
-  border: 1px solid rgba(245,158,11,.2);
-  border-radius: 14px;
-  padding: 2rem;
+  background: linear-gradient(135deg, #fffbeb 0%, #eff6ff 100%);
+  border: 2px solid #fde68a;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
   text-align: center;
+  box-shadow: 0 4px 16px rgba(245,158,11,.1);
 }
 .support-title {
   font-family: 'Unbounded', sans-serif;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: #0f172a;
   margin-bottom: .5rem;
 }
-.support-sub { font-size: .7rem; color: var(--muted); margin-bottom: 1.2rem; }
+.support-sub { font-size: .72rem; color: #64748b; margin-bottom: 1.4rem; }
 .support-btn {
   display: inline-block;
-  background: var(--accent);
-  color: #000;
+  background: #f59e0b;
+  color: #fff;
   font-family: 'Unbounded', sans-serif;
-  font-size: .7rem;
+  font-size: .72rem;
   font-weight: 700;
-  padding: .7rem 1.8rem;
-  border-radius: 8px;
+  padding: .8rem 2rem;
+  border-radius: 10px;
   text-decoration: none;
+  box-shadow: 0 4px 12px rgba(245,158,11,.35);
+  transition: background .2s, box-shadow .2s;
   letter-spacing: .02em;
-  transition: opacity .2s;
 }
-.support-btn:hover { opacity: .85; }
+.support-btn:hover { background: #d97706; box-shadow: 0 6px 16px rgba(245,158,11,.4); }
 
 footer {
   text-align: center;
-  padding: 2rem;
-  color: var(--muted);
-  font-size: .6rem;
-  border-top: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  color: #94a3b8;
+  font-size: .62rem;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+  margin-top: 1rem;
 }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
 <div class="hero">
   <div class="logo">Staff<span>Spy</span></div>
   <div class="tagline">Інструкція з використання</div>
@@ -368,9 +339,8 @@ footer {
 
 <div class="container">
 
-  <!-- КРОК 1 -->
   <div class="section">
-    <div class="section-label">Перший запуск</div>
+    <div class="section-label">Перший запуск — встановлення</div>
     <div class="steps">
 
       <div class="step">
@@ -378,11 +348,11 @@ footer {
         <div>
           <div class="step-title">Запустіть installer.ps1 від Адміністратора</div>
           <div class="step-desc">
-            Це потрібно зробити <b>один раз</b> на кожному комп'ютері який хочете відстежувати.<br><br>
+            Робиться <b>один раз</b> на кожному комп'ютері який потрібно відстежувати.<br><br>
             <b>Спосіб 1 —</b> Правий клік на файл <b>installer.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
             <b>Спосіб 2 —</b> Відкрити PowerShell від Адміністратора і виконати:
           </div>
-          <div class="code-block"><span class="code-cmd">powershell.exe</span> -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</div>
+          <div class="code-block">powershell.exe -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</div>
           <div class="warn-box">
             <span class="warn-icon">⚠️</span>
             Якщо Windows запитає "Дозволити програмі вносити зміни?" — натисніть <b>Так</b>
@@ -393,15 +363,15 @@ footer {
       <div class="step">
         <div class="step-num">2</div>
         <div>
-          <div class="step-title">Дочекайтесь завершення встановлення</div>
+          <div class="step-title">Дочекайтесь завершення</div>
           <div class="step-desc">
-            Скрипт автоматично налаштує систему і покаже повідомлення:<br><br>
+            Скрипт налаштує систему автоматично і покаже повідомлення:<br><br>
             <b>✅ ВСТАНОВЛЕННЯ ЗАВЕРШЕНО УСПІШНО</b><br><br>
-            Натисніть Enter для закриття. Встановлення займає ~1 хвилину.
+            Натисніть Enter щоб закрити вікно. Займає ~1 хвилину.
           </div>
           <div class="info-box">
             <span class="warn-icon">ℹ️</span>
-            З цього моменту система починає записувати всі запуски програм. Моніторинг працює автоматично у фоні.
+            З цього моменту система записує всі запуски програм у фоні. Нічого більше робити не потрібно.
           </div>
         </div>
       </div>
@@ -411,20 +381,18 @@ footer {
         <div>
           <div class="step-title">Якщо з'явилась помилка "виконання скриптів відключено"</div>
           <div class="step-desc">
-            Відкрийте <b>PowerShell від Адміністратора</b> і виконайте одну команду:
+            Відкрийте PowerShell від Адміністратора і запустіть файл цією командою:
           </div>
-          <div class="code-block"><span class="code-cmd">powershell.exe</span> -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</div>
+          <div class="code-block">powershell.exe -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</div>
           <div class="step-desc" style="margin-top:.6rem">
-            Після цього запустіть потрібний файл знову — через правий клік або командою:
+            Команда <b>-ExecutionPolicy Bypass</b> обходить обмеження без зміни системних налаштувань.
           </div>
-          
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- КРОК 2 -->
   <div class="section">
     <div class="section-label">Отримання звіту</div>
     <div class="steps">
@@ -434,25 +402,25 @@ footer {
         <div>
           <div class="step-title">Через тиждень — запустіть launcher.ps1</div>
           <div class="step-desc">
-            Можна запускати в будь-який момент — хоч через день, хоч через місяць.<br><br>
-            <b>Спосіб 1 —</b> Правий клік на файл <b>launcher.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
-            <b>Спосіб 2 —</b> Відкрити PowerShell від Адміністратора і виконати:
+            Можна запускати коли завгодно — через день, тиждень або місяць.<br><br>
+            <b>Спосіб 1 —</b> Правий клік на <b>launcher.ps1</b> → <b>"Запустити як адміністратор"</b><br><br>
+            <b>Спосіб 2 —</b> Через PowerShell:
           </div>
-          <div class="code-block"><span class="code-cmd">powershell.exe</span> -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\launcher.ps1"</div>
+          <div class="code-block">powershell.exe -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\launcher.ps1"</div>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">5</div>
         <div>
-          <div class="step-title">Зачекайте 1-2 хвилини</div>
+          <div class="step-title">Зачекайте 1–2 хвилини</div>
           <div class="step-desc">
-            Скрипт перевірить ліцензію, завантажить модуль аналізу і обробить всі дані.<br><br>
+            Скрипт перевірить ліцензію, завантажить модуль аналізу і обробить дані.<br><br>
             Після завершення <b>автоматично відкриється HTML звіт</b> у браузері.
           </div>
           <div class="info-box">
             <span class="warn-icon">💾</span>
-            Звіт зберігається у папці <b>C:\StaffSpy\</b> — можна відкривати пізніше або переносити на флешку.
+            Звіт зберігається у <b>C:\StaffSpy\</b> з датою в назві. Можна відкривати пізніше або копіювати на флешку.
           </div>
         </div>
       </div>
@@ -460,14 +428,13 @@ footer {
     </div>
   </div>
 
-  <!-- ЩО У ЗВІТІ -->
   <div class="section">
-    <div class="section-label">Що містить звіт</div>
+    <div class="section-label">Що міститься у звіті</div>
     <div class="report-features">
       <div class="feat-card">
         <div class="feat-icon">📅</div>
         <div class="feat-title">Дата і день тижня</div>
-        <div class="feat-desc">Коли саме запускалась програма — число, місяць, день тижня</div>
+        <div class="feat-desc">Коли запускалась програма — число, місяць, день тижня</div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">⏰</div>
@@ -490,14 +457,13 @@ footer {
         <div class="feat-desc">По даті, програмі, користувачу, дню тижня, статусу</div>
       </div>
       <div class="feat-card">
-        <div class="feat-icon">🚫</div>
-        <div class="feat-title">Без системних процесів</div>
-        <div class="feat-desc">Тільки програми користувача. Системні приховані за замовчуванням</div>
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Експорт в Excel</div>
+        <div class="feat-desc">Одна кнопка — і всі дані у таблиці Excel</div>
       </div>
     </div>
   </div>
 
-  <!-- FAQ -->
   <div class="section">
     <div class="section-label">Часті питання</div>
     <div class="faq">
@@ -507,7 +473,7 @@ footer {
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-a">
-          Аудит почав записувати дані тільки після встановлення installer.ps1. Якщо запустили launcher одразу — даних ще немає. Зачекайте хоча б кілька годин роботи комп'ютера і запустіть знову.
+          Аудит починає записувати дані тільки після встановлення installer.ps1. Якщо запустили launcher одразу після встановлення — даних ще немає. Зачекайте кілька годин роботи комп'ютера і запустіть знову.
         </div>
       </div>
       <div class="faq-item">
@@ -516,7 +482,7 @@ footer {
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-a">
-          Кількість запусків залежить від вашого тарифу. Залишок запусків показується в кінці кожного звіту. Поповнити можна в боті — /start → Придбати.
+          Кількість запусків залежить від тарифу. Залишок показується після кожного звіту. Поповнити можна в боті — /start → Придбати.
         </div>
       </div>
       <div class="faq-item">
@@ -525,88 +491,92 @@ footer {
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-a">
-          Ні. Моніторинг використовує вбудований механізм Windows (аудит процесів) який працює непомітно у фоні. Жодних додаткових процесів чи іконок в треї.
+          Ні. Використовується вбудований механізм Windows (аудит процесів) — жодних додаткових процесів чи іконок. Повністю непомітно.
         </div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span><b>?</b> Потрібен інтернет весь час?</span>
+          <span><b>?</b> Чи потрібен інтернет весь час?</span>
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-a">
-          Інтернет потрібен тільки при запуску launcher.ps1 — для перевірки ліцензії і завантаження модуля аналізу. Сам моніторинг працює повністю офлайн.
+          Інтернет потрібен тільки при запуску launcher.ps1 — для перевірки ліцензії. Сам моніторинг працює повністю офлайн.
         </div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">
-          <span><b>?</b> Чи потрібно встановлювати на кожен ПК окремо?</span>
+          <span><b>?</b> Чи зупиняється моніторинг після отримання звіту?</span>
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-a">
-          Так, installer.ps1 запускається один раз на кожному комп'ютері. Але launcher.ps1 можна запускати з флешки на будь-якому ПК де встановлений installer.
+          Ні. Моніторинг працює постійно після встановлення. launcher.ps1 лише зчитує накопичені дані — як переглянути запис з камери спостереження. Дані продовжують записуватись далі.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <span><b>?</b> Потрібно встановлювати на кожен ПК окремо?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Так, installer.ps1 запускається один раз на кожному комп'ютері. launcher.ps1 можна запускати з флешки на будь-якому ПК де встановлений installer.
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ПОМИЛКИ -->
   <div class="section">
     <div class="section-label">Вирішення помилок</div>
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <div class="err-wrap">
       <table class="err-table">
         <thead>
-          <tr>
-            <th>Помилка</th>
-            <th>Рішення</th>
-          </tr>
+          <tr><th>Помилка</th><th>Рішення</th></tr>
         </thead>
         <tbody>
           <tr>
             <td class="err-err">Виконання скриптів відключено</td>
-            <td class="err-fix">powershell.exe -ExecutionPolicy Bypass -File "C:\Users\rr\Desktop\installer.ps1"</td>
+            <td class="err-fix">powershell.exe -ExecutionPolicy Bypass -File "шлях\до\файлу.ps1"</td>
           </tr>
           <tr>
             <td class="err-err">Аудит не налаштовано</td>
-            <td class="err-fix">Запустіть installer.ps1 від Адміністратора</td>
+            <td class="err-fix">Запустіть installer.ps1 від Адміністратора на цьому ПК</td>
           </tr>
           <tr>
             <td class="err-err">Невірний ключ або пароль</td>
-            <td class="err-fix">Перевірте ключ і пароль з повідомлення бота — скопіюйте точно</td>
+            <td class="err-fix">Скопіюйте ключ і пароль точно з повідомлення бота</td>
           </tr>
           <tr>
             <td class="err-err">Ліцензію вичерпано</td>
-            <td class="err-fix">Придбайте нову ліцензію в боті — /start → Придбати</td>
+            <td class="err-fix">Придбайте нову ліцензію: /start → Придбати</td>
           </tr>
           <tr>
             <td class="err-err">Не вдалося підключитись до сервера</td>
             <td class="err-fix">Перевірте інтернет-з'єднання і запустіть знову</td>
+          </tr>
+          <tr>
+            <td class="err-err">Звіт порожній</td>
+            <td class="err-fix">Зачекайте кілька годин після встановлення і запустіть launcher знову</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- ПІДТРИМКА -->
   <div class="section">
     <div class="support-box">
       <div class="support-title">Потрібна допомога?</div>
-      <div class="support-sub">Відповідаємо протягом 30 хвилин в робочий час</div>
+      <div class="support-sub">Відповідаємо протягом 30 хвилин у робочий час</div>
       <a href="https://t.me/StaffSpy_01_Bot" class="support-btn">✉️ Написати в підтримку</a>
     </div>
   </div>
 
 </div>
 
-<footer>
-  StaffSpy v1.0 &bull; Інструкція для клієнта
-</footer>
+<footer>StaffSpy v2.0 &bull; Інструкція для клієнта</footer>
 
 <script>
 function toggleFaq(el) {
-  const item = el.closest('.faq-item');
-  item.classList.toggle('open');
+  el.closest('.faq-item').classList.toggle('open');
 }
 </script>
-
 </body>
 </html>
