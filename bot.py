@@ -533,16 +533,18 @@ async def cb_demo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
     try:
+        demo_cap = (
+            "📦 StaffSpy Demo\n\n"
+            "1. Збережіть файл на робочий стіл\n"
+            "2. Відкрийте PowerShell від Адміністратора\n"
+            "3. Скопіюйте та виконайте команду:\n\n"
+            "powershell.exe -ExecutionPolicy Bypass -File C:\\Users\\Desktop\\audit_demo.ps1\n\n"
+            "Звіт збережеться на робочому столі."
+        )
         await ctx.bot.send_document(
             q.message.chat_id,
             document=open("audit_demo.ps1", "rb"),
-            caption=(
-                "📦 *StaffSpy Demo*\n\n"
-                "Запустіть від Адміністратора.\n"
-                "Звіт збережеться на робочому столі.\n\n"
-                "Для повної версії: /start → Придбати"
-            ),
-            parse_mode="Markdown"
+            caption=demo_cap
         )
     except Exception:
         await ctx.bot.send_message(
