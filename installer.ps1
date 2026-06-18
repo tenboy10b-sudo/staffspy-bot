@@ -29,9 +29,14 @@ Write-Host ""
 Write-Host "  [1/4] Enabling process audit..." -ForegroundColor Cyan
 
 try {
+    # Process Creation (4688)
     auditpol /set /subcategory:"{0CCE922B-69AE-11D9-BED3-505054503030}" /success:enable /failure:enable 2>&1 | Out-Null
+    # Process Termination (4689)
     auditpol /set /subcategory:"{0CCE9239-69AE-11D9-BED3-505054503030}" /success:enable /failure:enable 2>&1 | Out-Null
-    Write-Host "  [+] Process audit: enabled" -ForegroundColor Green
+    # Also try by name for localized Windows
+    auditpol /set /subcategory:"Process Creation"     /success:enable /failure:enable 2>&1 | Out-Null
+    auditpol /set /subcategory:"Process Termination"  /success:enable /failure:enable 2>&1 | Out-Null
+    Write-Host "  [+] Process audit: enabled (creation + termination)" -ForegroundColor Green
 } catch {
     Write-Host "  [!] Audit setup warning: $_" -ForegroundColor Yellow
 }
