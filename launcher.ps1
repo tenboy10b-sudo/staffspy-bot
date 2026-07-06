@@ -42,20 +42,8 @@ try {
     exit 1
 }
 
-# Step 2 - Register launch via webhook
-Write-Host "  [2/4] Registering launch..." -ForegroundColor Cyan
-
-try {
-    $launchTime  = Get-Date -Format "dd.MM.yyyy HH:mm"
-    $webhookBody = "{" + [char]34 + "action" + [char]34 + ":" + [char]34 + "use_license" + [char]34 + "," + [char]34 + "key" + [char]34 + ":" + [char]34 + $LICENSE_KEY + [char]34 + "," + [char]34 + "owner" + [char]34 + ":" + [char]34 + $checkData.owner + [char]34 + "," + [char]34 + "launch_time" + [char]34 + ":" + [char]34 + $launchTime + [char]34 + "," + [char]34 + "computer" + [char]34 + ":" + [char]34 + $env:COMPUTERNAME + [char]34 + "," + [char]34 + "user" + [char]34 + ":" + [char]34 + $env:USERNAME + [char]34 + "}"
-    Invoke-WebRequest -Uri "$RAILWAY_URL/launch" -Method POST -Body $webhookBody -ContentType "application/json" -UseBasicParsing -TimeoutSec 15 | Out-Null
-    Write-Host "  [+] Launch registered" -ForegroundColor Green
-} catch {
-    Write-Host "  [!] Webhook not responding (not critical)" -ForegroundColor DarkGray
-}
-
-# Step 3 - Check audit
-Write-Host "  [3/4] Checking audit settings..." -ForegroundColor Cyan
+# Step 2 - Check audit
+Write-Host "  [2/4] Checking audit settings..." -ForegroundColor Cyan
 
 $auditCheck = auditpol /get /subcategory:"{0CCE922B-69AE-11D9-BED3-505054503030}" 2>&1
 if ($auditCheck -notmatch "Success") {
@@ -68,8 +56,13 @@ if ($auditCheck -notmatch "Success") {
     Write-Host "  [+] Audit: active" -ForegroundColor Green
 }
 
-# Step 4 - Download and run spy_core via Railway proxy
-Write-Host "  [4/4] Loading analysis module..." -ForegroundColor Cyan
+# Step 3 - Download spy_core via Railway proxy
+# ВАЖЛИВО: це має відбутись ДО реєстрації запуску (Step 4). /get-core на сервері
+# перевіряє runs_used < runs_max - якщо спочатку зареєструвати запуск (що збільшує
+# runs_used), то на ОСТАННЬОМУ оплаченому запуску ця перевірка вже бачила б
+# вичерпаний ліміт і відхиляла б завантаження з "Invalid license", хоча клієнт
+# ще не встиг жодного разу скористатись цим запуском.
+Write-Host "  [3/4] Loading analysis module..." -ForegroundColor Cyan
 
 $reportDir  = "C:\StaffSpy"
 $reportName = "StaffSpyReport_" + (Get-Date -Format "yyyy-MM-dd_HH-mm") + ".html"
@@ -94,6 +87,19 @@ try {
     Write-Host "  [x] Download error: $_" -ForegroundColor Red
     Read-Host "  Press Enter to exit"
     exit 1
+}
+
+# Step 4 - Register launch via webhook (тільки ПІСЛЯ успішного завантаження ядра,
+# щоб не "з'їдати" запуск клієнта, якщо завантаження раптом не вдалось)
+Write-Host "  [4/4] Registering launch..." -ForegroundColor Cyan
+
+try {
+    $launchTime  = Get-Date -Format "dd.MM.yyyy HH:mm"
+    $webhookBody = "{" + [char]34 + "action" + [char]34 + ":" + [char]34 + "use_license" + [char]34 + "," + [char]34 + "key" + [char]34 + ":" + [char]34 + $LICENSE_KEY + [char]34 + "," + [char]34 + "owner" + [char]34 + ":" + [char]34 + $checkData.owner + [char]34 + "," + [char]34 + "launch_time" + [char]34 + ":" + [char]34 + $launchTime + [char]34 + "," + [char]34 + "computer" + [char]34 + ":" + [char]34 + $env:COMPUTERNAME + [char]34 + "," + [char]34 + "user" + [char]34 + ":" + [char]34 + $env:USERNAME + [char]34 + "}"
+    Invoke-WebRequest -Uri "$RAILWAY_URL/launch" -Method POST -Body $webhookBody -ContentType "application/json" -UseBasicParsing -TimeoutSec 15 | Out-Null
+    Write-Host "  [+] Launch registered" -ForegroundColor Green
+} catch {
+    Write-Host "  [!] Webhook not responding (not critical)" -ForegroundColor DarkGray
 }
 
 Write-Host ""
