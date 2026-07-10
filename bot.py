@@ -10,6 +10,7 @@ import hashlib
 import random
 import string
 import logging
+import asyncio
 from datetime import datetime
 from telegram import (
     Update, InlineKeyboardButton, InlineKeyboardMarkup,
@@ -74,15 +75,30 @@ GH_HEADERS = {
     "Accept": "application/vnd.github.v3+json",
 }
 
+async def gh_request(method: str, url: str, **kwargs):
+    """Обгортка над httpx-запитом з retry x3 (пауза 2 сек) — GitHub API іноді
+    віддає тимчасові 502/503/timeout, особливо під навантаженням."""
+    last_err = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient() as c:
+                r = await c.request(method, url, timeout=15, **kwargs)
+                r.raise_for_status()
+                return r
+        except Exception as e:
+            last_err = e
+            log.warning(f"GitHub API {method} {url} — спроба {attempt+1}/3 не вдалась: {e}")
+            if attempt < 2:
+                await asyncio.sleep(2)
+    raise last_err
+
 async def gh_get_file(filename: str) -> tuple[dict, str]:
     """Повертає (parsed_json, sha)"""
     url = f"{GITHUB_API}/repos/{GITHUB_OWNER}/{GITHUB_REPO}/contents/{filename}"
-    async with httpx.AsyncClient() as c:
-        r = await c.get(url, headers=GH_HEADERS, timeout=15)
-        r.raise_for_status()
-        data = r.json()
-        content = base64.b64decode(data["content"]).decode("utf-8")
-        return json.loads(content), data["sha"]
+    r = await gh_request("GET", url, headers=GH_HEADERS)
+    data = r.json()
+    content = base64.b64decode(data["content"]).decode("utf-8")
+    return json.loads(content), data["sha"]
 
 async def gh_put_file(filename: str, content: dict, sha: str, message: str):
     """Оновлює файл на GitHub"""
@@ -91,9 +107,7 @@ async def gh_put_file(filename: str, content: dict, sha: str, message: str):
         json.dumps(content, ensure_ascii=False, indent=2).encode("utf-8")
     ).decode("utf-8")
     body = {"message": message, "content": encoded, "sha": sha}
-    async with httpx.AsyncClient() as c:
-        r = await c.put(url, headers=GH_HEADERS, json=body, timeout=15)
-        r.raise_for_status()
+    await gh_request("PUT", url, headers=GH_HEADERS, json=body)
 
 # ══════════════════════════════════════════════════════════════
 #  ГЕНЕРАЦІЯ ЛІЦЕНЗІЇ
@@ -816,13 +830,12 @@ async def get_core(key: str = "", password: str = ""):
         if not license or not license.get("active") or license.get("runs_used", 0) >= license.get("runs_max", 0):
             return PlainTextResponse("# Invalid license", status_code=403)
 
-        # Get raw spy_core.ps1 from GitHub
+        # Get raw spy_core.ps1 from GitHub (з retry — саме тут стався 502 Bad Gateway,
+        # через який клієнт бачив "Download error" при робочій ліцензії)
         url = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}/contents/spy_core.ps1"
-        async with httpx.AsyncClient() as c:
-            r = await c.get(url, headers=GH_HEADERS, timeout=30)
-            r.raise_for_status()
-            raw_bytes = b64.b64decode(r.json()["content"])
-            raw = raw_bytes.decode("utf-8-sig")
+        r = await gh_request("GET", url, headers=GH_HEADERS)
+        raw_bytes = b64.b64decode(r.json()["content"])
+        raw = raw_bytes.decode("utf-8-sig")
 
         return PlainTextResponse(raw, status_code=200, media_type="text/plain; charset=utf-8")
 
